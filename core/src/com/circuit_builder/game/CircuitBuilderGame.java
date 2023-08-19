@@ -39,8 +39,11 @@ public class CircuitBuilderGame extends Game {
         camera.setToOrtho(false, Configuration.screen_width, Configuration.screen_height);
         sr = new ShapeRenderer();
         board = new Board(10, 10);
-        Wire w = new Wire(1, 1f, 3f, 4f, 3f);
-        board.addWire(w);
+        Wire w1 = new Wire(1, 1, 3, 4, 3);
+        Wire w2 = new Wire(2, 3, 5, 7, 5);
+        Wire w3 = new Wire(6, 8, 4, 8, 7);
+        Array<Wire> wires = new Array<Wire>(); wires.add(w1); wires.add(w2); wires.add(w3);
+        board.addWires(wires);
     }
 
     @Override

@@ -6,10 +6,10 @@ import com.badlogic.gdx.graphics.Color;
 
 public class Wire {
     public int color_id; // 1) red; 2) green; 3) blue; 4) black; 5) white); 6) orange
-    public float x1, y1, x2, y2;
+    public int x1, y1, x2, y2;
     public boolean active;
 
-    public Wire(int color_id, float x1, float y1, float x2, float y2) {
+    public Wire(int color_id, int x1, int y1, int x2, int y2) {
         this.color_id = color_id;
         this.x1 = x1; this.x2 = x2; 
         this.y1 = y1; this.y2 = y2;
@@ -44,6 +44,12 @@ public class Wire {
                     (float) y1 * (float) Configuration.grid_box_height + board_y, 
                     (float) x2 * (float) Configuration.grid_box_width + board_x, 
                     (float) y2 * (float) Configuration.grid_box_height + board_y, 
+                    Configuration.grid_line_width);
+        sr.circle((float) x1 * (float) Configuration.grid_box_width + board_x,
+                    (float) y1 * (float) Configuration.grid_box_height + board_y,
+                    Configuration.grid_line_width);
+        sr.circle((float) x2 * (float) Configuration.grid_box_width + board_x,
+                    (float) y2 * (float) Configuration.grid_box_height + board_y,
                     Configuration.grid_line_width);
         sr.end();
     }

@@ -1,7 +1,9 @@
 package com.circuit_builder.game;
+
+import java.util.Iterator;
+
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g3d.particles.ParticleShader.Config;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 
@@ -30,6 +32,12 @@ public class Board {
         this.gridColor = getDefaultGridColor();
         this.components = new Array<Component>();
         this.wires = new Array<Wire>();
+    }
+
+    public void addWires(Array<Wire> wires) {
+        for (Iterator<Wire> iter = wires.iterator(); iter.hasNext(); ) {
+            this.addWire(iter.next());
+        }
     }
 
     public void addWire(Wire wire) {
