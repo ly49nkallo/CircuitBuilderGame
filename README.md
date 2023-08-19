@@ -2,6 +2,8 @@
 
 Author: Ty Brennan
 
+![image](assets/demo.png)
+
 This game is designed to be a creative circuit building sandbox for people who are interested in electrical engineering or computer engineering.
 
 This game is partially inspired by the [NAND game](https://nandgame.com) and at-home circuit building kits.
