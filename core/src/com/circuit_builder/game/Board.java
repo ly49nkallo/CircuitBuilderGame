@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.Rectangle;
 
 public class Board {
     // GRID DIMENSIONS
@@ -13,25 +14,70 @@ public class Board {
     public int height;
     public Color boardColor;
     public Color gridColor;
+    public int x, y; // board location
     // 
     public Array<Component> components;
     public Array<Wire> wires;
+    public Array<Segment> segments;
 
-    public Color getDefaultBoardColor() {
-        return new Color(0.1f, 0.15f, 0.12f, 1f);
-    }
+    public Rectangle[] vertices;
 
-    public Color getDefaultGridColor() {
-        return new Color(0.3f, 0.3f, 0.3f, 1f);
-    }
+    public static Color getDefaultBoardColor = new Color(0.1f, 0.15f, 0.12f, 1f);
+    public static Color getDefaultGridColor = new Color(0.3f, 0.3f, 0.3f, 1f);
+    public static Color getDefaultVertexColor = new Color(Color.GRAY);
 
     public Board(int width, int height) {
         this.width = width;
         this.height = height;
-        this.boardColor = getDefaultBoardColor();
-        this.gridColor = getDefaultGridColor();
+        this.boardColor = getDefaultBoardColor;
+        this.gridColor = getDefaultGridColor;
         this.components = new Array<Component>();
         this.wires = new Array<Wire>();
+        this.vertices = new Rectangle[this.height * this.width];
+    }
+
+    public void constructVertexObjects(){
+        for (int i = 0; i < this.height; i++) {
+            for (int j = 0; j < this.width; j++) {
+                int coord_x = i * Configuration.grid_box_width + x;
+                int coord_y = j * Configuration.grid_box_height + y;
+                this.vertices[(i * this.width) + j] = new Rectangle((float) coord_x, (float) coord_y, 
+                                                                    (float) Configuration.grid_line_width, 
+                                                                    (float) Configuration.grid_line_width);
+            }
+        }
+    }
+    public void constructSegments() {
+        for (int i = 0; i < this.height; i++) {
+            for (int j = 0; j < this.width; j++) {
+                if (i != this.height - 1) segments.add(new Segment(j, i, j, i + 1));
+                if (j != this.width - 1) segments.add(new Segment(j, i, j + 1, i));
+            }
+        }
+    }
+
+    public void renderSegments(ShapeRenderer sr) {
+        sr.begin(ShapeType.Filled);
+        sr.setColor(Color.BROWN);
+        for (Segment s : segments) {
+            float[] coords = s.getScreenSpaceCoordinatesForEndpoints(x, y);
+            sr.rectLine(coords[0], coords[1], coords[2], coords[3], Configuration.grid_line_width);
+        }
+        sr.end();
+    }
+
+    public void renderVertexObjects(ShapeRenderer sr) {
+        sr.begin(ShapeType.Filled);
+        sr.setColor(getDefaultVertexColor);
+        for (Rectangle v : vertices) {
+            sr.circle(v.x, v.y, Configuration.grid_line_width);
+        }
+        sr.end();
+    }
+    //@TODO add wires remove segment behavior
+    public void setLocation(int x, int y) {
+        this.x = x;
+        this.y = y;
     }
 
     public void addWires(Array<Wire> wires) {
@@ -51,7 +97,7 @@ public class Board {
         };
     }
 
-    public void render(ShapeRenderer sr, int x, int y) {
+    public void render(ShapeRenderer sr) {
         sr.begin(ShapeType.Filled);
         // draw background
         sr.setColor(this.boardColor);
@@ -81,5 +127,6 @@ public class Board {
         for (Component c: components) {
             c.render(sr, this);
         }
+        // renderVertexObjects(sr);
     }
 }

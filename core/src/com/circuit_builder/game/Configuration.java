@@ -9,4 +9,6 @@ public class Configuration {
     public static final int grid_box_width = 40; // in pixels
     public static final int grid_box_height = 40; // in pixels
     public static final Color background_color = new Color(0.1f, 0.1f, 0.1f, 1f);
+    public static final int default_wire_color = 1; //red
+    public static final long cooldown = 200000000; //0.2 seconds
 }

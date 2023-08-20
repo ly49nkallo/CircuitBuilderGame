@@ -8,7 +8,7 @@ import com.circuit_builder.game.CircuitBuilderGame;
 public class DesktopLauncher {
 	public static void main (String[] arg) {
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
-		config.setForegroundFPS(60);
+		config.setForegroundFPS(30);
 		config.setTitle("Circuit Builder");
 		config.setWindowedMode(800, 480);
 		config.useVsync(true);
