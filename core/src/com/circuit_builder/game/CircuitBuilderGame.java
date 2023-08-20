@@ -33,13 +33,16 @@ public class CircuitBuilderGame extends Game {
     private OrthographicCamera camera;
     ShapeRenderer sr;
     Board board;
+    Colorbar colorbar;
     public int selected_color;
+    public int selected_component; //
     public long last_time_touched;
     
     @Override
     public void create () {
         last_time_touched = TimeUtils.nanoTime();
         selected_color = Configuration.default_wire_color;
+        selected_component = 0;
         camera = new OrthographicCamera();
         camera.setToOrtho(false, Configuration.screen_width, Configuration.screen_height);
         sr = new ShapeRenderer();
@@ -49,6 +52,10 @@ public class CircuitBuilderGame extends Game {
             Configuration.screen_height / 2 - (this.board.getGridDimensions()[1] / 2));
         board.constructVertexObjects();
         board.constructSegments();
+        colorbar = new Colorbar();
+        colorbar.setLocation(
+            Configuration.screen_width / 2 - (Colorbar.getWidth / 2),
+            20 - (Colorbar.getHeight / 2));
     }
 
     @Override
@@ -56,8 +63,6 @@ public class CircuitBuilderGame extends Game {
         ScreenUtils.clear(Configuration.background_color);
         camera.update();
         sr.setProjectionMatrix(camera.combined);
-
-        this.board.render(sr);
 
         long cooldown = Configuration.cooldown;
         float ptrX = Gdx.input.getX();
@@ -67,15 +72,22 @@ public class CircuitBuilderGame extends Game {
         camera.unproject(touchPosition);
         ptrX = touchPosition.x; 
         ptrY = touchPosition.y; 
+        /* BOARD */
+        this.board.render(sr);
         Segment closestSegment = board.getClosestSegment(ptrX, ptrY);
-        closestSegment.selectedRender(sr, board);
-        if (Gdx.input.isTouched() && TimeUtils.nanoTime() - last_time_touched > cooldown) {
-            board.segments.removeValue(closestSegment, false);
-            board.segments.add(new Wire(selected_color, closestSegment.x1, closestSegment.y1, closestSegment.x2, closestSegment.y2));
-            last_time_touched = TimeUtils.nanoTime();
+        closestSegment.selectedRender(sr, board); // mouseover select render
+        if (board.getBoundingBox().contains(ptrX, ptrY)){
+            if (Gdx.input.isTouched() && TimeUtils.nanoTime() - last_time_touched > cooldown) {
+                board.segments.removeValue(closestSegment, false);
+                board.segments.add(new Wire(selected_color, closestSegment.x1, closestSegment.y1, closestSegment.x2, closestSegment.y2));
+                last_time_touched = TimeUtils.nanoTime();
+            }
         }
-    }
+        /* COLORBAR */
+        this.colorbar.render(sr, selected_color);
 
+
+    }
     
     @Override
     public void dispose () {

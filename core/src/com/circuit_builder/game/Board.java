@@ -14,7 +14,7 @@ public class Board {
     public int height;
     public Color boardColor;
     public Color gridColor;
-    public int x, y; // board location
+    public float x, y; // board location
     // 
     public Array<Component> components;
     public Array<Wire> wires;
@@ -22,8 +22,8 @@ public class Board {
 
     public Rectangle[] vertices;
 
-    public static Color getDefaultBoardColor = new Color(0.1f, 0.15f, 0.12f, 1f);
-    public static Color getDefaultVertexColor = new Color(Color.GRAY);
+    public static final Color getDefaultBoardColor = new Color(0.1f, 0.15f, 0.12f, 1f);
+    public static final Color getDefaultVertexColor = new Color(Color.GRAY);
 
     public Board(int width, int height) {
         this.width = width;
@@ -38,10 +38,10 @@ public class Board {
     public void constructVertexObjects(){
         for (int i = 0; i < this.height; i++) {
             for (int j = 0; j < this.width; j++) {
-                int coord_x = i * Configuration.grid_box_width + x;
-                int coord_y = j * Configuration.grid_box_height + y;
-                this.vertices[(i * this.width) + j] = new Rectangle((float) coord_x, (float) coord_y, 
-                                                                    (float) Configuration.grid_line_width, 
+                float coord_x = i * Configuration.grid_box_width + x;
+                float coord_y = j * Configuration.grid_box_height + y;
+                this.vertices[(i * this.width) + j] = new Rectangle(coord_x, coord_y, 
+                                                                    Configuration.grid_line_width, 
                                                                     (float) Configuration.grid_line_width);
             }
         }
@@ -94,7 +94,7 @@ public class Board {
         return closestSegment;
     }
     //@TODO add wires remove segment behavior
-    public void setLocation(int x, int y) {
+    public void setLocation(float x, float y) {
         this.x = x;
         this.y = y;
     }
@@ -109,37 +109,28 @@ public class Board {
         this.wires.add(wire);
     }
 
-    public final int[] getGridDimensions() {
-        return new int[] {
+    public final float[] getGridDimensions() {
+        return new float[] {
             (this.width - 1) * Configuration.grid_box_width, 
             (this.height - 1) * Configuration.grid_box_height
         };
     }
 
-    public void render(ShapeRenderer sr) {
+    public Rectangle getBoundingBox() {
+        float[] grid_dims = getGridDimensions();
+        return new Rectangle((float) x, (float) y, (float) grid_dims[0], (float) grid_dims[1]);
+    }
+
+    public void renderBackground(ShapeRenderer sr) {
         sr.begin(ShapeType.Filled);
         // draw background
         sr.setColor(this.boardColor);
         sr.rect((float) x, (float) y, getGridDimensions()[0], getGridDimensions()[1]);
-        // draw grid
-        // sr.setColor(this.gridColor);
-        // // vertical lines
-        // for (int i = 0; i < this.width; i++) {
-        //     sr.rectLine((float) x + (float) i * Configuration.grid_box_width,
-        //                 (float) y,
-        //                 (float) x + (float) i * Configuration.grid_box_width,
-        //                 (float) y + (float) getGridDimensions()[1],
-        //                 Configuration.grid_line_width);
-        // }
-        // // horizontal lines
-        // for (int i = 0; i < this.height; i++) {
-        //     sr.rectLine((float) x - (float) Configuration.grid_line_width / 2, 
-        //                 (float) y + (float) i * Configuration.grid_box_height,
-        //                 (float) x + (float) getGridDimensions()[0] + (float) Configuration.grid_line_width / 2,
-        //                 (float) y + (float) i * Configuration.grid_box_height,
-        //                 Configuration.grid_line_width);
-        // }
         sr.end();
+    }
+
+    public void render(ShapeRenderer sr) {
+        renderBackground(sr);
         for (Component c: components) {
             c.render(sr, this);
         }

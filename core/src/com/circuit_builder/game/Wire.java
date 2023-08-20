@@ -19,22 +19,7 @@ public class Wire extends Segment{
 
     @Override
     public Color getColor() {
-        switch (color_id) {
-            case 1:
-                return Color.RED;
-            case 2:
-                return Color.GREEN;
-            case 3:
-                return Color.BLUE;
-            case 4:
-                return Color.BLACK;
-            case 5:
-                return Color.WHITE;
-            case 6:
-                return Color.ORANGE;
-            default:
-                return Color.PURPLE;
-        }
+        return Configuration.color_map(this.color_id);
     }
 
     @Override
