@@ -17,7 +17,8 @@ public class Wire extends Segment{
         active = false;
     }
 
-    public static Color getColor(int color_id) {
+    @Override
+    public Color getColor() {
         switch (color_id) {
             case 1:
                 return Color.RED;
@@ -36,13 +37,10 @@ public class Wire extends Segment{
         }
     }
 
-    public void render(ShapeRenderer sr, Board parent, float board_x, float board_y) {
-        sr.begin(ShapeType.Filled);
-        sr.setColor(getColor(this.color_id));
-        float[] coords = getScreenSpaceCoordinatesForEndpoints(board_x, board_y);
-        sr.rectLine(coords[0], coords[1],
-                    coords[2], coords[3],
-                    Configuration.grid_line_width);
-        sr.end();
+    @Override
+    public Color getSelectedColor() {
+        Color c = getColor();
+        float brightness = Configuration.brightness_increase_wire;
+        return new Color(c.r + brightness, c.g + brightness, c.b + brightness, c.a);
     }
 }

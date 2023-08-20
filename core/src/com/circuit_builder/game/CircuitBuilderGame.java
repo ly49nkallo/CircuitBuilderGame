@@ -47,14 +47,6 @@ public class CircuitBuilderGame extends Game {
         board.setLocation( // centered location
             Configuration.screen_width / 2 - (this.board.getGridDimensions()[0] / 2),
             Configuration.screen_height / 2 - (this.board.getGridDimensions()[1] / 2));
-        Wire w1 = new Wire(1, 1, 3, 4, 3);
-        Wire w2 = new Wire(2, 3, 5, 7, 5);
-        Wire w3 = new Wire(6, 8, 4, 8, 7);
-        Array<Wire> wires = new Array<Wire>(); 
-        wires.add(w1); 
-        wires.add(w2); 
-        wires.add(w3);
-        board.addWires(wires);
         board.constructVertexObjects();
         board.constructSegments();
     }
@@ -64,33 +56,22 @@ public class CircuitBuilderGame extends Game {
         ScreenUtils.clear(Configuration.background_color);
         camera.update();
         sr.setProjectionMatrix(camera.combined);
-        this.board.render(sr);
-        long cooldown = Configuration.cooldown;
-        if (Gdx.input.isTouched() && TimeUtils.nanoTime() - last_time_touched > cooldown) {
-            float ptrX = Gdx.input.getX();
-            float ptrY = Gdx.input.getY();
-            Vector3 touchPosition = new Vector3();
-            touchPosition.set(ptrX, ptrY, 0f);
-            camera.unproject(touchPosition);
-            ptrX = touchPosition.x; 
-            ptrY = touchPosition.y;
 
-            float lowestDist = Float.MAX_VALUE;
-            int lowestIdx = board.wires.size;
-            for (int i = 0; i < board.wires.size; i++) {
-                Segment w = board.segments.get(i);
-                float [] coords = w.getScreenSpaceCoordinatesForEndpoints(this.board.x, this.board.y);
-                float x1 = coords[0]; float y1 = coords[1]; float x2 = coords[2]; float y2 = coords[3];
-                float dist = ((x1 - ptrX) * (x1 - ptrX))
-                            + ((y1 - ptrY) * (y1 - ptrY))
-                            + ((x2 - ptrX) * (x2 - ptrX))
-                            + ((y2 - ptrY) * (y2 - ptrY));
-                if (dist < lowestDist) {
-                    lowestDist = dist;
-                    lowestIdx = i;
-                }
-            }
-            Segment closestSegment = board.wires.get(lowestIdx);
+        this.board.render(sr);
+
+        long cooldown = Configuration.cooldown;
+        float ptrX = Gdx.input.getX();
+        float ptrY = Gdx.input.getY();
+        Vector3 touchPosition = new Vector3();
+        touchPosition.set(ptrX, ptrY, 0f);
+        camera.unproject(touchPosition);
+        ptrX = touchPosition.x; 
+        ptrY = touchPosition.y; 
+        Segment closestSegment = board.getClosestSegment(ptrX, ptrY);
+        closestSegment.selectedRender(sr, board);
+        if (Gdx.input.isTouched() && TimeUtils.nanoTime() - last_time_touched > cooldown) {
+            board.segments.removeValue(closestSegment, false);
+            board.segments.add(new Wire(selected_color, closestSegment.x1, closestSegment.y1, closestSegment.x2, closestSegment.y2));
             last_time_touched = TimeUtils.nanoTime();
         }
     }

@@ -11,4 +11,7 @@ public class Configuration {
     public static final Color background_color = new Color(0.1f, 0.1f, 0.1f, 1f);
     public static final int default_wire_color = 1; //red
     public static final long cooldown = 200000000; //0.2 seconds
+    public static final Color default_segment_color = new Color(0.3f, 0.2f, 0.1f, 1f);
+    public static final Color default_segment_selected_color = new Color(0.4f, 0.3f, 0.2f, 1f);
+    public static final float brightness_increase_wire = 0.4f;
 }
