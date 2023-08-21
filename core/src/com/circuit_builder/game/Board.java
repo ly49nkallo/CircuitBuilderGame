@@ -3,6 +3,7 @@ package com.circuit_builder.game;
 import java.util.Iterator;
 
 import com.badlogic.gdx.utils.Array;
+import java.util.Arrays;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
@@ -17,7 +18,6 @@ public class Board {
     public float x, y; // board location
     // 
     public Array<Component> components;
-    public Array<Wire> wires;
     public Array<Segment> segments;
 
     public Rectangle[] vertices;
@@ -73,6 +73,36 @@ public class Board {
         }
         sr.end();
     }
+
+    public boolean hasWire(int[] endpoints) {
+        for (Segment w : segments) {
+            if (w instanceof Wire && Arrays.equals(w.getEndpoints(), endpoints)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean hasComponent(int i, int j) {
+        for (Component c : components) {
+            if (c.x <= i && c.x + c.width -1 >= i && c.y <= j && c.y + c.height -1 >= j) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean addComponent(Component component) {
+        for (int i = 0; i < component.height; i++) {
+            for (int j = 0; j < component.width; j++){
+                if (hasComponent(i, j))
+                    return false;
+            }
+        }
+        this.components.add(component);
+        return true;
+    }
+
     public Segment getClosestSegment(float ptrX, float ptrY) {
         // @TODO Super inefficient maybe fix later make better code dang it!
         float lowestDist = Float.MAX_VALUE;
@@ -99,16 +129,6 @@ public class Board {
         this.y = y;
     }
 
-    public void addWires(Array<Wire> wires) {
-        for (Iterator<Wire> iter = wires.iterator(); iter.hasNext(); ) {
-            this.addWire(iter.next());
-        }
-    }
-
-    public void addWire(Wire wire) {
-        this.wires.add(wire);
-    }
-
     public final float[] getGridDimensions() {
         return new float[] {
             (this.width - 1) * Configuration.grid_box_width, 
@@ -131,10 +151,10 @@ public class Board {
 
     public void render(ShapeRenderer sr) {
         renderBackground(sr);
+        renderSegments(sr);
         for (Component c: components) {
             c.render(sr, this);
         }
-        renderSegments(sr);
         // renderVertexObjects(sr);
     }
 }

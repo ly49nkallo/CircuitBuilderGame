@@ -38,6 +38,13 @@ public class Configuration {
 
     public static final float color_box_side_length = screen_width / 15; // in pixels
     public static final float color_box_selected_expand_percent = 0.1F;
-    public static final float color_box_selected_expand = (float) color_box_side_length * color_box_selected_expand_percent;
+    public static final float color_box_selected_expand = (float) color_box_side_length * (1f + color_box_selected_expand_percent);
     public static final float space_between_boxes = color_box_side_length * 0.2f;
+
+    public static final Color default_component_color = Color.LIGHT_GRAY;
+    public static final Color stud_color = Color.WHITE;
+    public static final float component_overhang = grid_box_width * 0.1f;
+
+    public static final int battery_width = 2;
+    public static final int battery_height = 3;
 }

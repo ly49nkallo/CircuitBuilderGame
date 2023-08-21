@@ -21,6 +21,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.Input;
 
 // public static final int screen_width = 800; // in pixels
 // public static final int screen_height = 480; // in pixels
@@ -37,9 +38,11 @@ public class CircuitBuilderGame extends Game {
     public int selected_color;
     public int selected_component; //
     public long last_time_touched;
+    public int clock;
     
     @Override
     public void create () {
+        clock = 0;
         last_time_touched = TimeUtils.nanoTime();
         selected_color = Configuration.default_wire_color;
         selected_component = 0;
@@ -52,6 +55,7 @@ public class CircuitBuilderGame extends Game {
             Configuration.screen_height / 2 - (this.board.getGridDimensions()[1] / 2));
         board.constructVertexObjects();
         board.constructSegments();
+        board.addComponent(new Source(0,0));
         colorbar = new Colorbar();
         colorbar.setLocation(
             Configuration.screen_width / 2 - (Colorbar.getWidth / 2),
@@ -60,6 +64,8 @@ public class CircuitBuilderGame extends Game {
 
     @Override
     public void render () {
+        // long start = TimeUtils.nanoTime();
+
         ScreenUtils.clear(Configuration.background_color);
         camera.update();
         sr.setProjectionMatrix(camera.combined);
@@ -74,20 +80,37 @@ public class CircuitBuilderGame extends Game {
         ptrY = touchPosition.y; 
         /* BOARD */
         this.board.render(sr);
-        Segment closestSegment = board.getClosestSegment(ptrX, ptrY);
-        closestSegment.selectedRender(sr, board); // mouseover select render
         if (board.getBoundingBox().contains(ptrX, ptrY)){
-            if (Gdx.input.isTouched() && TimeUtils.nanoTime() - last_time_touched > cooldown) {
+            Segment closestSegment = board.getClosestSegment(ptrX, ptrY);
+            closestSegment.selectedRender(sr, board); // mouseover select render
+            if (Gdx.input.isButtonPressed(Input.Buttons.LEFT) && TimeUtils.nanoTime() - last_time_touched > cooldown) {
                 board.segments.removeValue(closestSegment, false);
                 board.segments.add(new Wire(selected_color, closestSegment.x1, closestSegment.y1, closestSegment.x2, closestSegment.y2));
+                last_time_touched = TimeUtils.nanoTime();
+            }
+            if (Gdx.input.isButtonPressed(Input.Buttons.RIGHT) && TimeUtils.nanoTime() - last_time_touched > cooldown) {
+                board.segments.removeValue(closestSegment, false);
+                board.segments.add(new Segment(closestSegment.x1, closestSegment.y1, closestSegment.x2, closestSegment.y2));
                 last_time_touched = TimeUtils.nanoTime();
             }
         }
         /* COLORBAR */
         this.colorbar.render(sr, selected_color);
-
-
-    }
+        if (colorbar.getBoundingBox().contains(ptrX, ptrY)) {
+            if (Gdx.input.isButtonPressed(Input.Buttons.LEFT) && TimeUtils.nanoTime() - last_time_touched > cooldown) {
+                {
+                int i = 1;
+                for (Rectangle r : colorbar.boxes) {
+                    if (r.contains(ptrX, ptrY)) {
+                        selected_color = i;
+                    }
+                    i++;
+                }
+                }
+            }
+        }
+    // if (clock % 30 == 0) System.out.println("Render Loop took  " + (TimeUtils.timeSinceNanos(start)) + " nanoseconds");
+    clock++;}
     
     @Override
     public void dispose () {

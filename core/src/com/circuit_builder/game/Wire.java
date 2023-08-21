@@ -11,9 +11,6 @@ public class Wire extends Segment{
     public Wire(int color_id, int x1, int y1, int x2, int y2) {
         super(x1, y1, x2, y2);
         this.color_id = color_id;
-
-        // ensure wire is either horizontal, vertical, or at a 45 degree angle
-
         active = false;
     }
 

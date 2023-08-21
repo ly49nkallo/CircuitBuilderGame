@@ -1,9 +1,60 @@
 package com.circuit_builder.game;
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.Rectangle;
 
-public abstract class Component {
-    public int coord_x, coord_y; // from bottom left and most bottom left node
+public class Component {
+    public int x, y; // from bottom left and most bottom left node
     public int width, height; // number of nodes to span
-    public abstract void render(ShapeRenderer sr, Board parent);
+    public String name;
+    public Rectangle cachedBounds;
+    public boolean rotated;
+
+    public Component(int x, int y, int width, int height, String name) {
+        this.x = x; this.y = y;
+        this.width = width; this.height = height;
+        this.name = name;
+        this.rotated = false;
+    }
+
+    public void render(ShapeRenderer sr, Board parent) {
+        sr.begin(ShapeType.Filled);
+        sr.setColor(Configuration.default_component_color);
+        Rectangle bounds = getBoundingBox(parent);
+        sr.rect(bounds.x, bounds.y, bounds.width, bounds.height);
+        sr.setColor(Configuration.stud_color);
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++){
+                if (rotated) {}
+                float coord_x = j * Configuration.grid_box_width + (x * Configuration.grid_box_width) + parent.x;
+                float coord_y = i * Configuration.grid_box_height + (y * Configuration.grid_box_height) + parent.y;
+                Rectangle r = new Rectangle(
+                    coord_x, coord_y, 
+                    Configuration.grid_line_width, 
+                    Configuration.grid_line_width);
+                sr.circle(r.x, r.y, r.width);
+            }
+        }
+        sr.end();
+    }
+
+    public void setLocation(int x, int y) {
+        this.x = x; this.y = y;
+        this.cachedBounds = null;
+    }
+    // get logical screen space bounding box
+    public Rectangle getBoundingBox(Board parent) {
+        if (cachedBounds != null)
+            return cachedBounds;
+        final float o = Configuration.component_overhang;
+        Rectangle out = new Rectangle(
+            (float) x * Configuration.grid_box_width + parent.x - o, 
+            (float) y * Configuration.grid_box_height + parent.y - o, 
+            (float) (width - 1) * Configuration.grid_box_width + (2 * o), 
+            (float) (height - 1) * Configuration.grid_box_height + (2 * o));
+        System.out.println("Recalculate bounds for component");
+        cachedBounds = out;
+        return out;
+    }
 }
