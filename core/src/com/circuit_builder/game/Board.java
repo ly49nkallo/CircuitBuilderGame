@@ -7,6 +7,7 @@ import java.util.Arrays;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 
 public class Board {
@@ -149,11 +150,11 @@ public class Board {
         sr.end();
     }
 
-    public void render(ShapeRenderer sr) {
+    public void render(ShapeRenderer sr, SpriteBatch sb) {
         renderBackground(sr);
         renderSegments(sr);
         for (Component c: components) {
-            c.render(sr, this);
+            c.render(sr, sb, this);
         }
         // renderVertexObjects(sr);
     }

@@ -2,6 +2,7 @@ package com.circuit_builder.game;
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 
 public class Component {
@@ -18,7 +19,7 @@ public class Component {
         this.rotated = false;
     }
 
-    public void render(ShapeRenderer sr, Board parent) {
+    public void render(ShapeRenderer sr, SpriteBatch sb, Board parent) {
         sr.begin(ShapeType.Filled);
         sr.setColor(Configuration.default_component_color);
         Rectangle bounds = getBoundingBox(parent);

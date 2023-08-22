@@ -33,6 +33,7 @@ public class CircuitBuilderGame extends Game {
 
     private OrthographicCamera camera;
     ShapeRenderer sr;
+    SpriteBatch sb;
     Board board;
     Colorbar colorbar;
     public int selected_color;
@@ -49,6 +50,7 @@ public class CircuitBuilderGame extends Game {
         camera = new OrthographicCamera();
         camera.setToOrtho(false, Configuration.screen_width, Configuration.screen_height);
         sr = new ShapeRenderer();
+        sb = new SpriteBatch(200);
         board = new Board(10, 10);
         board.setLocation( // centered location
             Configuration.screen_width / 2 - (this.board.getGridDimensions()[0] / 2),
@@ -79,7 +81,7 @@ public class CircuitBuilderGame extends Game {
         ptrX = touchPosition.x; 
         ptrY = touchPosition.y; 
         /* BOARD */
-        this.board.render(sr);
+        this.board.render(sr, sb);
         if (board.getBoundingBox().contains(ptrX, ptrY)){
             Segment closestSegment = board.getClosestSegment(ptrX, ptrY);
             closestSegment.selectedRender(sr, board); // mouseover select render
