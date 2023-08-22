@@ -3,12 +3,12 @@ import com.badlogic.gdx.graphics.Color;
 
 public class Configuration {
     // just a bunch of static parameters that are used elsewhere in the application
-    public static final int screen_width = 800; // in pixels
-    public static final int screen_height = 480; // in pixels
+    public static final int screen_width = 1300; // in pixels
+    public static final int screen_height = 800; // in pixels
 
-    public static final float grid_line_width = (float) screen_width / 160; // in pixels
-    public static final float grid_box_width = (float) screen_width / 20; // in pixels
-    public static final float grid_box_height = (float) screen_width / 20; // in pixels
+    public static final float grid_line_width = (float) screen_width / 320; // in pixels
+    public static final float grid_box_width = (float) screen_width / 40; // in pixels
+    public static final float grid_box_height = (float) grid_box_width; // in pixels
     public static final Color background_color = new Color(0.1f, 0.1f, 0.1f, 1f);
     public static final int default_wire_color = 1;
     public static final long cooldown = 200000000; //0.2 seconds
@@ -43,7 +43,7 @@ public class Configuration {
 
     public static final Color default_component_color = Color.LIGHT_GRAY;
     public static final Color stud_color = Color.WHITE;
-    public static final float component_overhang = grid_box_width * 0.1f;
+    public static final float component_overhang = grid_box_width * 0.3f;
 
     public static final int battery_width = 2;
     public static final int battery_height = 3;

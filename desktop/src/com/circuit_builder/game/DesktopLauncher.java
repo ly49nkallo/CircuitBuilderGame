@@ -3,6 +3,7 @@ package com.circuit_builder.game;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.circuit_builder.game.CircuitBuilderGame;
+import com.circuit_builder.game.Configuration;
 
 // Please note that on macOS your application needs to be started with the -XstartOnFirstThread JVM argument
 public class DesktopLauncher {
@@ -10,7 +11,7 @@ public class DesktopLauncher {
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 		config.setForegroundFPS(30);
 		config.setTitle("Circuit Builder");
-		config.setWindowedMode(800, 480);
+		config.setWindowedMode(Configuration.screen_width, Configuration.screen_height);
 		config.useVsync(true);
 		new Lwjgl3Application(new CircuitBuilderGame(), config);
 	}

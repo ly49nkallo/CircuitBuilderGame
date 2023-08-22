@@ -57,7 +57,7 @@ public class CircuitBuilderGame extends Game {
             Configuration.screen_height / 2 - (this.board.getGridDimensions()[1] / 2));
         board.constructVertexObjects();
         board.constructSegments();
-        board.addComponent(new Source(0,0));
+        board.addComponent(new Source(2, 2));
         colorbar = new Colorbar();
         colorbar.setLocation(
             Configuration.screen_width / 2 - (Colorbar.getWidth / 2),
