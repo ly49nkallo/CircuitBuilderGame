@@ -14,12 +14,14 @@ public class Component {
     public String name;
     public Rectangle cachedBounds;
     public int rotation; // 0) UP 1) RIGHT 2) DOWN 3) LEFT
+    public Texture texture;
 
-    public Component(int x, int y, int width, int height, String name) {
+    public Component(int x, int y, int width, int height, String name, Texture texture) {
         this.x = x; this.y = y;
         this.width = width; this.height = height;
         this.name = name;
         this.rotation = 0;
+        this.texture = texture;
     }
 
     public void render(ShapeRenderer sr, SpriteBatch sb, Board parent) {
@@ -40,6 +42,10 @@ public class Component {
             }
         }
         sr.end();
+
+        sb.begin();
+        sb.draw(texture, bounds.x, bounds.y, bounds.width, bounds.height);
+        sb.end();
     }
 
     public void setLocation(int x, int y) {
@@ -53,6 +59,7 @@ public class Component {
         this.rotation = rotation;
         cachedBounds = null;
     }
+
     // get logical screen space bounding box
     public Rectangle getBoundingBox(Board parent) {
         if (cachedBounds != null)
@@ -68,7 +75,7 @@ public class Component {
         return out;
     }
 
-    public void render_sprite(ShapeRenderer sr, SpriteBatch sb, float x, float y) {
+    public static void render_sprite_background(ShapeRenderer sr, float x, float y) {
         sr.begin(ShapeType.Filled);
         sr.setColor(Configuration.default_component_color);
         sr.rect(x, y, Configuration.component_sprite_width, Configuration.component_sprite_width);
