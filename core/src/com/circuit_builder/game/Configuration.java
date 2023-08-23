@@ -47,4 +47,6 @@ public class Configuration {
 
     public static final int battery_width = 2;
     public static final int battery_height = 3;
+
+    public static final float component_sprite_width = screen_width / 20;
 }

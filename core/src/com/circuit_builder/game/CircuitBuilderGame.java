@@ -37,7 +37,7 @@ public class CircuitBuilderGame extends Game {
     Board board;
     Colorbar colorbar;
     public int selected_color;
-    public int selected_component; //
+    public String selected_component;
     public long last_time_touched;
     public int clock;
     
@@ -46,7 +46,7 @@ public class CircuitBuilderGame extends Game {
         clock = 0;
         last_time_touched = TimeUtils.nanoTime();
         selected_color = Configuration.default_wire_color;
-        selected_component = 0;
+        selected_component = "source";
         camera = new OrthographicCamera();
         camera.setToOrtho(false, Configuration.screen_width, Configuration.screen_height);
         sr = new ShapeRenderer();
@@ -109,6 +109,18 @@ public class CircuitBuilderGame extends Game {
                     i++;
                 }
                 }
+            }
+        }
+        /* COMPONENT BAR */
+        { 
+            int i = 0;
+            for (Component c : board.components) {
+                System.out.println(c.name);
+                c.render_sprite(
+                    sr, sb, 
+                    Configuration.screen_width - 100f, 
+                    Configuration.screen_height - ((float) i * 40));
+                i++;
             }
         }
     // if (clock % 30 == 0) System.out.println("Render Loop took  " + (TimeUtils.timeSinceNanos(start)) + " nanoseconds");

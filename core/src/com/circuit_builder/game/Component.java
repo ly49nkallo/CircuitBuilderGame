@@ -2,8 +2,11 @@ package com.circuit_builder.game;
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
 
 public class Component {
     public int x, y; // from bottom left and most bottom left node
@@ -57,5 +60,12 @@ public class Component {
         System.out.println("Recalculate bounds for component");
         cachedBounds = out;
         return out;
+    }
+
+    public void render_sprite(ShapeRenderer sr, SpriteBatch sb, float x, float y) {
+        sr.begin(ShapeType.Filled);
+        sr.setColor(Configuration.default_component_color);
+        sr.rect(x, y, Configuration.component_sprite_width, Configuration.component_sprite_width);
+        sr.end();
     }
 }
