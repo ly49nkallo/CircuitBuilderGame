@@ -116,10 +116,21 @@ public class CircuitBuilderGame extends Game {
                     i++;
                 }
                 }
+                last_time_touched = TimeUtils.nanoTime();
             }
         }
         /* COMPONENT BAR */
         this.componentBar.render(sr, sb, selected_component);
+        if (componentBar.getBoundingBox().contains(ptrX, ptrY)) {
+            if ((Gdx.input.isButtonPressed(Input.Keys.NUM_1) || Gdx.input.isButtonPressed(Input.Keys.NUMPAD_1)) && TimeUtils.nanoTime() - last_time_touched > cooldown) {
+                for (int i = 0; i < componentBar.boxes.length; i++) {
+                    if (componentBar.boxes[i].contains(ptrX, ptrY)) {
+                        selected_component = i + 1;
+                    }
+                }
+                last_time_touched = TimeUtils.nanoTime();
+            }
+        }
     // if (clock % 30 == 0) System.out.println("Render Loop took  " + (TimeUtils.timeSinceNanos(start)) + " nanoseconds");
     clock++;}
     
