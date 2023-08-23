@@ -13,7 +13,7 @@ public class Source extends Component{
     public Source(int x, int y) {
         super(x, y, Configuration.battery_width, Configuration.battery_height, "Source");
         this.x = x; this.y = y;
-        texture = new Texture(Gdx.files.internal("Source.png"));
+        texture = new Texture(Gdx.files.internal("assets/Source.png"));
     }
 
     public void render(ShapeRenderer sr, SpriteBatch sb, Board parent) {

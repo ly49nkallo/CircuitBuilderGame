@@ -13,13 +13,13 @@ public class Component {
     public int width, height; // number of nodes to span
     public String name;
     public Rectangle cachedBounds;
-    public boolean rotated;
+    public int rotation; // 0) UP 1) RIGHT 2) DOWN 3) LEFT
 
     public Component(int x, int y, int width, int height, String name) {
         this.x = x; this.y = y;
         this.width = width; this.height = height;
         this.name = name;
-        this.rotated = false;
+        this.rotation = 0;
     }
 
     public void render(ShapeRenderer sr, SpriteBatch sb, Board parent) {
@@ -30,7 +30,6 @@ public class Component {
         sr.setColor(Configuration.stud_color);
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++){
-                if (rotated) {}
                 float coord_x = j * Configuration.grid_box_width + (x * Configuration.grid_box_width) + parent.x;
                 float coord_y = i * Configuration.grid_box_height + (y * Configuration.grid_box_height) + parent.y;
                 Rectangle r = new Rectangle(
@@ -46,6 +45,13 @@ public class Component {
     public void setLocation(int x, int y) {
         this.x = x; this.y = y;
         this.cachedBounds = null;
+    }
+
+    public void rotate(int rotation) {
+        System.out.println("rotation not implemented");
+        if (rotation == this.rotation) return;
+        this.rotation = rotation;
+        cachedBounds = null;
     }
     // get logical screen space bounding box
     public Rectangle getBoundingBox(Board parent) {

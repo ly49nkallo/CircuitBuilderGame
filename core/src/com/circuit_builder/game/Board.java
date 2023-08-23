@@ -84,9 +84,17 @@ public class Board {
         return false;
     }
 
+    public Segment getSegment(int[] endpoints) {
+        for (Segment s : segments) {
+            if (Arrays.equals(s.getEndpoints(), endpoints)) {
+                return s;
+            }
+        }
+        return null;
+    }
     public boolean hasComponent(int i, int j) {
         for (Component c : components) {
-            if (c.x <= i && c.x + c.width -1 >= i && c.y <= j && c.y + c.height -1 >= j) {
+            if (c.x <= j && c.x + c.width -1 >= j && c.y <= i && c.y + c.height -1 >= i) {
                 return true;
             }
         }
@@ -98,6 +106,18 @@ public class Board {
             for (int j = 0; j < component.width; j++){
                 if (hasComponent(i, j))
                     return false;
+            }
+        }
+        for (int i = 0; i < component.height; i++) {
+            for (int j = 0; j < component.width; j++){
+                int cx = j + component.x;
+                int cy = i + component.y;
+                Segment s1 = null;
+                Segment s2 = null;
+                if (i != component.height - 1) s1 = getSegment(new int[] {cx, cy, cx, cy + 1});
+                if (j != component.width - 1) s2 = getSegment(new int[] {cx, cy, cx + 1, cy});
+                if (s1 != null) segments.removeValue(s1, false);
+                if (s2 != null) segments.removeValue(s2, false);
             }
         }
         this.components.add(component);
