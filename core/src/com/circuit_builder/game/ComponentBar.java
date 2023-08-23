@@ -21,7 +21,8 @@ public class ComponentBar {
         for (int i = 0; i < boxes.length; i++) {
             boxes[i] = new Rectangle(
                 x,
-                y + Configuration.number_of_components * 1.2f - ((float) i * Configuration.number_of_components * 1.2f),
+                y + Configuration.number_of_components * Configuration.component_sprite_width 
+                - ((float) (i + 1) *  Configuration.component_sprite_width),
                 Configuration.component_sprite_width,
                 Configuration.component_sprite_width
             );
@@ -32,11 +33,11 @@ public class ComponentBar {
         return new Rectangle(
             this.x, this.y, 
             Configuration.component_sprite_width,
-            Configuration.component_sprite_width * 1.2f * Configuration.number_of_components);
+            Configuration.component_sprite_width * Configuration.number_of_components);
     }
 
     public void render(ShapeRenderer sr, SpriteBatch sb, int selected_component) {
-        Rectangle bounds = getBoundingBox();
+        Rectangle bounds = getBoundingBox(); 
         // selected box
         sr.begin(ShapeType.Filled);
         sr.setColor(Color.WHITE);
@@ -53,19 +54,17 @@ public class ComponentBar {
             sr.rect(r.x, r.y, r.width, r.height);
         }
         sr.end();
-        
+
         sb.begin();
         for (int i = 0; i < boxes.length; i++){
             Rectangle r = boxes[i];
             sb.draw(
-                // Configuration.getTextureFromComponentID(i + 1), 
-                Source.s_texture,
+                Configuration.getTextureFromComponentID(i + 1), 
                 r.x, 
                 r.y, 
                 r.width, 
                 r.height);
         }
         sb.end();
-    }
-
+  }
 }

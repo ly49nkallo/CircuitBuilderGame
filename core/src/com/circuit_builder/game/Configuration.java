@@ -49,7 +49,7 @@ public class Configuration {
     public static final int battery_width = 2;
     public static final int battery_height = 3;
 
-    public static final int number_of_components = 1;
+    public static final int number_of_components = 2;
     public static final float component_sprite_width = screen_width / 20;
     public static final float component_bar_selected_background = component_sprite_width * 1.2f;
 
@@ -57,6 +57,8 @@ public class Configuration {
         switch(component_id) {
             case 1:
                 return Source.s_texture;
+            case 2:
+                return Resistor.s_texture;
             default:
                 return Source.s_texture;
         }

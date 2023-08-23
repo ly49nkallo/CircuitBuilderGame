@@ -4,18 +4,23 @@ import matplotlib.pyplot as plt
 import itertools
 import numpy as np
 
-if not (len(sys.argv) == 3):
+if not (len(sys.argv) == 3 or len(sys.argv) == 2):
     print("USAGE python(3) remove_background.py <FILEPATH> <OUTPUT>")
     exit(1)
 
+if (len(sys.argv) == 2):
+    out_path = Path(sys.argv[1])
+else:
+    out_path = Path(sys.argv[2])
+
 path = Path(sys.argv[1])
-out_path = Path(sys.argv[2])
 ext = sys.argv[1].split('.')[-1].lower()
 supported_formats = ['png']
 
-if sys.argv[2].split('.')[-1].lower() != ext:
-    print("extensions not the same")
-    exit(1)
+if len(sys.argv) == 3:
+    if sys.argv[2].split('.')[-1].lower() != ext:
+        print("extensions not the same")
+        exit(1)
 
 if ext not in supported_formats:
     print("filetype not supported")
