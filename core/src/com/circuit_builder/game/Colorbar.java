@@ -28,14 +28,16 @@ public class Colorbar {
 
     public void render(ShapeRenderer sr, int selected_color) {
         sr.begin(ShapeType.Filled);
-        Rectangle selectedBox = boxes[selected_color-1];
-        sr.setColor(Color.WHITE);
-        float sl = (Configuration.color_box_selected_expand - Configuration.color_box_side_length) / 2;
-        sr.rect(
-            selectedBox.x - sl,
-            selectedBox.y - sl,
-            Configuration.color_box_selected_expand,
-            Configuration.color_box_selected_expand);
+        if (selected_color != -1) {
+            Rectangle selectedBox = boxes[selected_color-1];
+            sr.setColor(Color.WHITE);
+            float sl = (Configuration.color_box_selected_expand - Configuration.color_box_side_length) / 2;
+            sr.rect(
+                selectedBox.x - sl,
+                selectedBox.y - sl,
+                Configuration.color_box_selected_expand,
+                Configuration.color_box_selected_expand);
+        }
         int i = 1;
         for (Rectangle box : boxes) {
             sr.setColor(Configuration.color_map(i));

@@ -21,7 +21,7 @@ public class Board {
     public Array<Component> components;
     public Array<Segment> segments;
 
-    public Rectangle[] vertices;
+    public Vertex[] vertices;
 
     public static final Color getDefaultBoardColor = new Color(0.1f, 0.15f, 0.12f, 1f);
     public static final Color getDefaultVertexColor = new Color(Color.GRAY);
@@ -32,18 +32,20 @@ public class Board {
         this.boardColor = getDefaultBoardColor;
         this.gridColor = Configuration.default_segment_color;
         this.components = new Array<Component>();
-        this.vertices = new Rectangle[this.height * this.width];
+        this.vertices = new Vertex[this.height * this.width];
         this.segments = new Array<Segment>();
     }
 
     public void constructVertexObjects(){
         for (int i = 0; i < this.height; i++) {
             for (int j = 0; j < this.width; j++) {
-                float coord_x = i * Configuration.grid_box_width + x;
-                float coord_y = j * Configuration.grid_box_height + y;
-                this.vertices[(i * this.width) + j] = new Rectangle(coord_x, coord_y, 
-                                                                    Configuration.grid_line_width, 
-                                                                    (float) Configuration.grid_line_width);
+                float coord_x = j * Configuration.grid_box_width + x;
+                float coord_y = i * Configuration.grid_box_height + y;
+                Rectangle bounds = new Rectangle(coord_x, coord_y, 
+                                                        Configuration.grid_line_width, 
+                                                        (float) Configuration.grid_line_width);
+                this.vertices[(i * this.width) + j] = new Vertex(j, i);
+                this.vertices[(i * this.width) + j].bounds = bounds;
             }
         }
     }
@@ -69,8 +71,8 @@ public class Board {
     public void renderVertexObjects(ShapeRenderer sr) {
         sr.begin(ShapeType.Filled);
         sr.setColor(getDefaultVertexColor);
-        for (Rectangle v : vertices) {
-            sr.circle(v.x, v.y, Configuration.grid_line_width);
+        for (Vertex v : vertices) {
+            sr.circle(v.bounds.x, v.bounds.y, Configuration.grid_line_width);
         }
         sr.end();
     }
@@ -101,10 +103,21 @@ public class Board {
         return false;
     }
 
+    public Component getComponent(int i, int j) {
+        for (Component c : components) {
+            if (c.x <= j && c.x + c.width -1 >= j && c.y <= i && c.y + c.height -1 >= i) {
+                return c;
+            }
+        }
+        return null;
+    }
+
     public boolean addComponent(Component component) {
+        if (component.x + component.width > this.width || component.y + component.height > this.height)
+            return false;
         for (int i = 0; i < component.height; i++) {
             for (int j = 0; j < component.width; j++){
-                if (hasComponent(i, j))
+                if (hasComponent(i + component.y, j + component.x))
                     return false;
             }
         }
@@ -121,6 +134,25 @@ public class Board {
             }
         }
         this.components.add(component);
+        return true;
+    }
+
+    public boolean removeComponent(Component component) {
+        if (!this.components.contains(component, false))
+            return false;
+        for (int i = 0; i < component.height; i++) {
+            for (int j = 0; j < component.width; j++){
+                int cx = j + component.x;
+                int cy = i + component.y;
+                Segment s1 = null;
+                Segment s2 = null;
+                if (i != component.height - 1) s1 = new Segment(cx, cy, cx, cy + 1);
+                if (j != component.width - 1) s2 = new Segment(cx, cy, cx + 1, cy);
+                if (s1 != null) segments.add(s1);
+                if (s2 != null) segments.add(s2);
+            }
+        }
+        this.components.removeValue(component, false);
         return true;
     }
 
@@ -141,8 +173,25 @@ public class Board {
                 lowestIdx = i;
             }
         }
+        if (lowestIdx == segments.size) return null;
         Segment closestSegment = segments.get(lowestIdx);
         return closestSegment;
+    }
+
+    public Vertex getClosestVertex(float ptrX, float ptrY) {
+        float lowestDist = Float.MAX_VALUE;
+        int lowestIdx = vertices.length;
+        for (int i = 0; i < vertices.length; i++) {
+            Vertex v = vertices[i];
+            float dist = ((v.bounds.x - ptrX) * (v.bounds.x - ptrX)) + ((v.bounds.y - ptrY) * (v.bounds.y - ptrY));
+            if (dist < lowestDist) {
+                lowestDist = dist;
+                lowestIdx = i;
+            }
+        }
+        if (lowestIdx == vertices.length) return null;
+        Vertex closestVertex = vertices[lowestIdx];
+        return closestVertex;
     }
     //@TODO add wires remove segment behavior
     public void setLocation(float x, float y) {

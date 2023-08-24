@@ -41,13 +41,15 @@ public class ComponentBar {
         // selected box
         sr.begin(ShapeType.Filled);
         sr.setColor(Color.WHITE);
-        Rectangle selectedBox = boxes[selected_component - 1];
-        float o = ((Configuration.component_bar_selected_background - Configuration.component_sprite_width) / 2);
-        sr.rect(
-            selectedBox.x - o,
-            selectedBox.y - o,
-            Configuration.component_bar_selected_background,
-            Configuration.component_bar_selected_background);
+        if (selected_component > -1) {
+            Rectangle selectedBox = boxes[selected_component - 1];
+            float o = ((Configuration.component_bar_selected_background - Configuration.component_sprite_width) / 2);
+            sr.rect(
+                selectedBox.x - o,
+                selectedBox.y - o,
+                Configuration.component_bar_selected_background,
+                Configuration.component_bar_selected_background);
+        }
         sr.setColor(Color.GRAY);
         for (int i = 0; i < boxes.length; i++) {
             Rectangle r = boxes[i];

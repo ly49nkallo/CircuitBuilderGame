@@ -49,9 +49,14 @@ public class Configuration {
     public static final int battery_width = 2;
     public static final int battery_height = 3;
 
+    public static final int resistor_width = 1;
+    public static final int resistor_height = 3;
+
     public static final int number_of_components = 2;
     public static final float component_sprite_width = screen_width / 20;
     public static final float component_bar_selected_background = component_sprite_width * 1.2f;
+
+    /* I hate this shit */
 
     public static Texture getTextureFromComponentID(int component_id) {
         switch(component_id) {
@@ -60,7 +65,37 @@ public class Configuration {
             case 2:
                 return Resistor.s_texture;
             default:
-                return Source.s_texture;
+                return null;
+        }
+    }
+    public static int getWidthFromComponentID(int component_id) {
+        switch(component_id) {
+            case 1:
+                return battery_width;
+            case 2:
+                return resistor_width;
+            default:
+                return -1;
+        }
+    }
+    public static int getHeightFromComponentID(int component_id) {
+        switch(component_id) {
+            case 1:
+                return battery_height;
+            case 2:
+                return resistor_height;
+            default:
+                return -1;
+        }
+    }
+    public static Component getComponentInstanceFromComponentID(int component_id, int x, int y) {
+        switch(component_id) {
+            case 1:
+                return new Source(x, y);
+            case 2:
+                return new Resistor(x, y);
+            default:
+                return null;
         }
     }
 }
