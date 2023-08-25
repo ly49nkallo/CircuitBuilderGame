@@ -11,7 +11,7 @@ public class Resistor extends Component{
     public static Texture s_texture = new Texture(Gdx.files.internal("assets/Resistor.png"));
 
     public Resistor(int x, int y) {
-        super(x, y, Configuration.battery_width, Configuration.battery_height, "Resistor", Resistor.s_texture);
+        super(x, y, Configuration.resistor_width, Configuration.resistor_height, "Resistor", Resistor.s_texture);
     }
     /* obsolete */
     public static void render_sprite(ShapeRenderer sr, SpriteBatch sb, float x, float y) {

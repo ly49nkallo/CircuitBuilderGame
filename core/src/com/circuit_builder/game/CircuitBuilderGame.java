@@ -52,13 +52,12 @@ public class CircuitBuilderGame extends Game {
         camera.setToOrtho(false, Configuration.screen_width, Configuration.screen_height);
         sr = new ShapeRenderer();
         sb = new SpriteBatch(200);
-        board = new Board(10, 10);
+        board = new Board(20, 20);
         board.setLocation( // centered location
             Configuration.screen_width / 2 - (this.board.getGridDimensions()[0] / 2),
             Configuration.screen_height / 2 - (this.board.getGridDimensions()[1] / 2));
         board.constructVertexObjects();
         board.constructSegments();
-        board.addComponent(new Source(3, 2));
         colorbar = new Colorbar();
         colorbar.setLocation(
             Configuration.screen_width / 2 - (Colorbar.getWidth / 2),
@@ -136,7 +135,6 @@ public class CircuitBuilderGame extends Game {
                         board.removeComponent(component_instance);
                     }
                 }
-
             }
         }
         /* COLORBAR */

@@ -1,8 +1,13 @@
 package com.circuit_builder.game;
 
 import java.util.Iterator;
+import java.util.Stack;
 
 import com.badlogic.gdx.utils.Array;
+import com.circuit_builder.tree_utils.Node;
+import com.circuit_builder.tree_utils.Series;
+import com.circuit_builder.tree_utils.Parellel;
+
 import java.util.Arrays;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -93,6 +98,21 @@ public class Board {
             }
         }
         return null;
+    }
+
+    public Array<Segment> getSegmentsFromCoordinate(int x, int y) {
+        Array<Segment> out = new Array<Segment>(4);
+        for (int i = -1; i <= 1; i++) {
+            for (int j = -1; j <= 1; j++) {
+                if (i == 0 || j == 0) continue;
+                int[] endpoints = new int[] {x, y, x + i, y + j};
+                Segment s = this.getSegment(endpoints);
+                if (s != null) {
+                    out.add(s);
+                }
+            }
+        }
+        return out;
     }
     public boolean hasComponent(int i, int j) {
         for (Component c : components) {
@@ -226,5 +246,32 @@ public class Board {
             c.render(sr, sb, this);
         }
         // renderVertexObjects(sr);
+    }
+
+    public void simulate() {
+        // classless !
+    }
+
+    public Node compile() {
+        // for each wire
+        //   if wire not in accounted for
+        //     
+        Node root = new Series();
+        Array<Segment> accounted_for = new Array<Segment>(this.height * this.width);
+        Array<Array<Segment>> logical_sections = new Array<Array<Segment>>();
+        Array<Component> entangled_components = new Array<Component>();
+        for (Segment seg: this.segments) {
+            if (seg instanceof Wire) {
+                if (!accounted_for.contains(seg, true)) {
+                    int[] endpoints = seg.getEndpoints();
+                    Stack s = new Stack();
+                    while (true) {
+                        Array<Segment> attached1 = getSegmentsFromCoordinate(endpoints[0], endpoints[1]);
+                        Array<Segment> attached2 = getSegmentsFromCoordinate(endpoints[2], endpoints[3]);
+                    }
+                }
+            }
+        }
+        return new Series();
     }
 }

@@ -16,6 +16,8 @@ public class Component {
     public int rotation; // 0) UP 1) RIGHT 2) DOWN 3) LEFT
     public Texture texture;
 
+    public double I, V, R;
+
     public Component(int x, int y, int width, int height, String name, Texture texture) {
         this.x = x; this.y = y;
         this.width = width; this.height = height;
