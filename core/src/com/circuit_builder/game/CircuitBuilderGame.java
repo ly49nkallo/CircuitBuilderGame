@@ -95,6 +95,7 @@ public class CircuitBuilderGame extends Game {
                 if (Gdx.input.isButtonPressed(Input.Buttons.LEFT) && TimeUtils.nanoTime() - last_time_touched > cooldown) {
                     board.segments.removeValue(closestSegment, false);
                     board.segments.add(new Wire(selected_color, closestSegment.x1, closestSegment.y1, closestSegment.x2, closestSegment.y2));
+                    board.compile();
                     last_time_touched = TimeUtils.nanoTime();
                 }
                 if (Gdx.input.isButtonPressed(Input.Buttons.RIGHT) && TimeUtils.nanoTime() - last_time_touched > cooldown) {

@@ -2,6 +2,7 @@ package com.circuit_builder.game;
 
 import java.util.Iterator;
 import java.util.Stack;
+import java.util.Queue;
 
 import com.badlogic.gdx.utils.Array;
 import com.circuit_builder.tree_utils.Node;
@@ -83,8 +84,9 @@ public class Board {
     }
 
     public boolean hasWire(int[] endpoints) {
+        int[] endpoints_reversed = new int[] {endpoints[3], endpoints[2], endpoints[1], endpoints[0]};
         for (Segment w : segments) {
-            if (w instanceof Wire && Arrays.equals(w.getEndpoints(), endpoints)) {
+            if (w instanceof Wire && (Arrays.equals(w.getEndpoints(), endpoints) || Arrays.equals(w.getEndpoints(), endpoints_reversed))) {
                 return true;
             }
         }
@@ -92,8 +94,9 @@ public class Board {
     }
 
     public Segment getSegment(int[] endpoints) {
+        int[] endpoints_reversed = new int[] {endpoints[3], endpoints[2], endpoints[1], endpoints[0]};
         for (Segment s : segments) {
-            if (Arrays.equals(s.getEndpoints(), endpoints)) {
+            if (Arrays.equals(s.getEndpoints(), endpoints) || Arrays.equals(s.getEndpoints(), endpoints_reversed)){
                 return s;
             }
         }
@@ -104,14 +107,32 @@ public class Board {
         Array<Segment> out = new Array<Segment>(4);
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
-                if (i == 0 || j == 0) continue;
+                if ((i != 0 && j != 0) || (i == 0 && j == 0)) continue;
                 int[] endpoints = new int[] {x, y, x + i, y + j};
                 Segment s = this.getSegment(endpoints);
                 if (s != null) {
                     out.add(s);
                 }
+                else {
+                    endpoints = new int[] {x + i, y + j, x, y};
+                    s = this.getSegment(endpoints);
+                    if (s != null) {
+                        out.add(s);
+                    }
+                }
             }
         }
+        return out;
+    }
+
+    public Array<Wire> getWiresFromCoordinate(int x, int y) {
+        Array<Segment> segments = getSegmentsFromCoordinate(x, y);
+        Array<Wire> out = new Array<Wire>(4);
+        for (Segment s : segments) {
+            if (s instanceof Wire)
+                out.add((Wire) s);
+        }
+        System.out.println("For cordinate "+x+", "+y+", found "+out.size+" wires");
         return out;
     }
     public boolean hasComponent(int i, int j) {
@@ -249,29 +270,52 @@ public class Board {
     }
 
     public void simulate() {
-        // classless !
     }
 
     public Node compile() {
         // for each wire
         //   if wire not in accounted for
-        //     
+        //      perform DFS on the wire to find all components 
         Node root = new Series();
         Array<Segment> accounted_for = new Array<Segment>(this.height * this.width);
-        Array<Array<Segment>> logical_sections = new Array<Array<Segment>>();
-        Array<Component> entangled_components = new Array<Component>();
-        for (Segment seg: this.segments) {
-            if (seg instanceof Wire) {
-                if (!accounted_for.contains(seg, true)) {
-                    int[] endpoints = seg.getEndpoints();
-                    Stack s = new Stack();
-                    while (true) {
-                        Array<Segment> attached1 = getSegmentsFromCoordinate(endpoints[0], endpoints[1]);
-                        Array<Segment> attached2 = getSegmentsFromCoordinate(endpoints[2], endpoints[3]);
+        // Array<Array<Segment>> logical_sections = new Array<Array<Segment>>();
+        Array<Array<Component>> entangled_components = new Array<Array<Component>>();
+        Array<Array<Segment>> entangled_segments = new Array<Array<Segment>>();
+        for (int i = 0; i < this.segments.size; i++) {
+            Segment seg = this.segments.get(i);
+            if (seg instanceof Wire && !accounted_for.contains(seg, false)) {
+                Array<Segment> new_entanglement = new Array<Segment>();
+                //dfs
+                Stack<Wire> stack = new Stack<Wire>();
+                stack.push((Wire) seg);
+                while (!stack.empty()) {
+                    Segment v = stack.pop();
+                    int[] endpoints = v.getEndpoints();
+                    if (!accounted_for.contains(v, false)){
+                        accounted_for.add(v);
+                        new_entanglement.add(v);
+                        Array<Wire> attached1 = getWiresFromCoordinate(endpoints[0], endpoints[1]);
+                        Array<Wire> attached2 = getWiresFromCoordinate(endpoints[2], endpoints[3]);
+                        Array<Wire> attached = new Array<Wire>(attached1.size + attached2.size);
+                        attached.addAll(attached1);
+                        attached.addAll(attached2);
+                        System.out.println(attached.size);
+                        for (Wire s1 : attached) {
+                            stack.push(s1);
+                        }
                     }
                 }
+                entangled_segments.add(new_entanglement);
             }
         }
+        System.out.println("accounted_for.size = "+accounted_for.size);
+        System.out.println();
+        System.out.println("Entangled Wires");
+        System.out.println("===============");
+        for (Array<Segment> entanglement : entangled_segments) {
+            System.out.println("Entaglement of size "+entanglement.size);
+        }
+        System.out.println();
         return new Series();
     }
 }
