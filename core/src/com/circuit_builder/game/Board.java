@@ -299,7 +299,6 @@ public class Board {
                         Array<Wire> attached = new Array<Wire>(attached1.size + attached2.size);
                         attached.addAll(attached1);
                         attached.addAll(attached2);
-                        System.out.println(attached.size);
                         for (Wire s1 : attached) {
                             stack.push(s1);
                         }

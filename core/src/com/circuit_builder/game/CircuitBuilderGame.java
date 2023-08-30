@@ -37,6 +37,9 @@ public class CircuitBuilderGame extends Game {
     Board board;
     Colorbar colorbar;
     ComponentBar componentBar;
+    private float last_ptrX, last_ptrY;
+    private Segment last_segment;
+    private Vertex last_vertex;
     public int selected_color;
     public int selected_component;
     public long last_time_touched;
@@ -67,7 +70,7 @@ public class CircuitBuilderGame extends Game {
             Configuration.screen_width - 100f,
             Configuration.screen_height - (Configuration.number_of_components * 100f)
         );
-
+        this.last_ptrX = 0; this.last_ptrY = 0;
     }
 
     @Override
@@ -90,7 +93,14 @@ public class CircuitBuilderGame extends Game {
         this.board.render(sr, sb);
         if (board.getBoundingBox().contains(ptrX, ptrY)){
             if (selected_color != -1) {
-                Segment closestSegment = board.getClosestSegment(ptrX, ptrY);
+                Segment closestSegment;
+                if (last_ptrX == ptrX && last_ptrY == ptrY && last_segment != null) {
+                    closestSegment = last_segment;
+                }
+                else {
+                    closestSegment = board.getClosestSegment(ptrX, ptrY);
+                    last_segment = closestSegment;
+                }
                 closestSegment.selectedRender(sr, board); // mouseover select render
                 if (Gdx.input.isButtonPressed(Input.Buttons.LEFT) && TimeUtils.nanoTime() - last_time_touched > cooldown) {
                     board.segments.removeValue(closestSegment, false);
@@ -107,7 +117,14 @@ public class CircuitBuilderGame extends Game {
             // place component
             else if (selected_component != -1) {
                  // render vertexes
-                Vertex closestVertex = board.getClosestVertex(ptrX, ptrY);
+                Vertex closestVertex;
+                if (last_ptrX == ptrX && last_ptrY == ptrY && last_vertex != null) {
+                    closestVertex = last_vertex;
+                }
+                else {
+                    closestVertex = board.getClosestVertex(ptrX, ptrY);
+                    last_vertex = closestVertex;
+                }
                 int _width = Configuration.getWidthFromComponentID(selected_component);
                 int _height = Configuration.getHeightFromComponentID(selected_component);
                 sr.begin(ShapeType.Filled);
@@ -174,7 +191,7 @@ public class CircuitBuilderGame extends Game {
             // System.out.println("Selected Component :" + selected_component);
             // System.out.println("Selected Wire Color :" + selected_color);
         }
-        
+        this.last_ptrX = ptrX; this.last_ptrY = ptrY;
     if (clock % 30 == 0) System.out.println("Render Loop took  " + (TimeUtils.timeSinceNanos(start)) + " nanoseconds");
     clock++;}
     
