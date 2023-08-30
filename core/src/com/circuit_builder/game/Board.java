@@ -272,54 +272,73 @@ public class Board {
     }
 
     public Node compile() {
+        /* Generate logical tree that represents circuit so we can simulate it */
+
         // for each wire
         //   if wire not in accounted for
-        //      perform DFS on the wire to find all components 
+        //      perform DFS on the wire to find all components attached to segment or it's neighbors
+        //      store entangled components into array
         Node root = new Series();
         Array<Segment> accounted_for = new Array<Segment>(this.height * this.width);
-        // Array<Array<Segment>> logical_sections = new Array<Array<Segment>>();
         Array<Array<Component>> entangled_components = new Array<Array<Component>>();
-        Array<Array<Segment>> entangled_segments = new Array<Array<Segment>>();
+        Array<Array<Wire>> entangled_segments = new Array<Array<Wire>>();
         for (int i = 0; i < this.segments.size; i++) {
             Segment seg = this.segments.get(i);
             if (seg instanceof Wire && !accounted_for.contains(seg, false)) {
-                //dfs
+                //depth first search (maybe optimal maybe not... java stack is pretty sexy)
                 Stack<Wire> stack = new Stack<Wire>();
-                Array<Segment> new_entanglement = new Array<Segment>();
-                int color = seg.color_id;
-                if (color == 0)
-                    System.out.println("WHAT THE FLYING FUCK" + seg.color_id + seg.x1 + seg.y1 + seg.x2 + seg.y2);
-                stack.push((Wire) seg);
+                Array<Component> new_entanglement = new Array<Component>();
+                Array<Wire> new_wire_entanglement = new Array<Wire>();
+                Wire wire = (Wire) seg;
+                int color = wire.color_id;
+                stack.push(wire);
                 while (!stack.empty()) {
-                    Segment v = stack.pop();
+                    Wire v = stack.pop();
                     int[] endpoints = v.getEndpoints();
                     if (!accounted_for.contains(v, false)){
                         accounted_for.add(v);
-                        new_entanglement.add(v);
+                        new_wire_entanglement.add(v);
                         Array<Wire> attached1 = getWiresFromCoordinate(endpoints[0], endpoints[1]);
                         Array<Wire> attached2 = getWiresFromCoordinate(endpoints[2], endpoints[3]);
                         Array<Wire> attached = new Array<Wire>(attached1.size + attached2.size);
                         attached.addAll(attached1);
                         attached.addAll(attached2);
                         for (Wire s1 : attached) {
-                            if (s1.color_id == color)
+                            if (s1 != v && s1.color_id == color)
                                 stack.push(s1);
-                            else
-                                System.out.println("" + s1.color_id + "," + color);
                         }
                     }
                 }
-                entangled_segments.add(new_entanglement);
+                entangled_components.add(new_entanglement);
+                entangled_segments.add(new_wire_entanglement);
             }
         }
         System.out.println("accounted_for.size = "+accounted_for.size);
-        System.out.println();
         System.out.println("Entangled Wires");
         System.out.println("===============");
-        for (Array<Segment> entanglement : entangled_segments) {
+        for (Array<Wire> entanglement : entangled_segments)
             System.out.println("Entaglement of size "+entanglement.size);
-        }
         System.out.println();
+        // iterate over every pair of groups of components
+        for (int i = 0; i < entangled_components.size; i++) {
+            for (int j = 0; j < entangled_components.size; j++) {
+                if (i == j) continue;
+                Array<Component> ca1 = entangled_components.get(i); 
+                Array<Component> ca2 = entangled_components.get(j);
+                Array<Component> overlap = new Array<Component>(ca1.size + ca2.size);
+                {for (Component c1 : ca1)
+                    for (Component c2 : ca2)
+                        if (c1 == c2) 
+                            overlap.add(c1);}
+                if (overlap.size == 1) {
+                    //TODO
+                    // Quest to the 6502
+                }
+                else if (overlap.size >= 2) {
+
+                }
+            }
+        }
         return new Series();
     }
 }
