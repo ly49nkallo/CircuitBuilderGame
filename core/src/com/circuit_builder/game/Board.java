@@ -94,7 +94,7 @@ public class Board {
     }
 
     public Segment getSegment(int[] endpoints) {
-        int[] endpoints_reversed = new int[] {endpoints[3], endpoints[2], endpoints[1], endpoints[0]};
+        int[] endpoints_reversed = new int[] {endpoints[2], endpoints[3], endpoints[0], endpoints[1]};
         for (Segment s : segments) {
             if (Arrays.equals(s.getEndpoints(), endpoints) || Arrays.equals(s.getEndpoints(), endpoints_reversed)){
                 return s;
@@ -132,7 +132,6 @@ public class Board {
             if (s instanceof Wire)
                 out.add((Wire) s);
         }
-        System.out.println("For cordinate "+x+", "+y+", found "+out.size+" wires");
         return out;
     }
     public boolean hasComponent(int i, int j) {
@@ -284,9 +283,12 @@ public class Board {
         for (int i = 0; i < this.segments.size; i++) {
             Segment seg = this.segments.get(i);
             if (seg instanceof Wire && !accounted_for.contains(seg, false)) {
-                Array<Segment> new_entanglement = new Array<Segment>();
                 //dfs
                 Stack<Wire> stack = new Stack<Wire>();
+                Array<Segment> new_entanglement = new Array<Segment>();
+                int color = seg.color_id;
+                if (color == 0)
+                    System.out.println("WHAT THE FLYING FUCK" + seg.color_id + seg.x1 + seg.y1 + seg.x2 + seg.y2);
                 stack.push((Wire) seg);
                 while (!stack.empty()) {
                     Segment v = stack.pop();
@@ -300,7 +302,10 @@ public class Board {
                         attached.addAll(attached1);
                         attached.addAll(attached2);
                         for (Wire s1 : attached) {
-                            stack.push(s1);
+                            if (s1.color_id == color)
+                                stack.push(s1);
+                            else
+                                System.out.println("" + s1.color_id + "," + color);
                         }
                     }
                 }
