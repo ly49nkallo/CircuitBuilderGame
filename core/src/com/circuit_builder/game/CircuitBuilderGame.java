@@ -111,6 +111,7 @@ public class CircuitBuilderGame extends Game {
                 if (Gdx.input.isButtonPressed(Input.Buttons.RIGHT) && TimeUtils.nanoTime() - last_time_touched > cooldown) {
                     board.segments.removeValue(closestSegment, false);
                     board.segments.add(new Segment(closestSegment.x1, closestSegment.y1, closestSegment.x2, closestSegment.y2));
+                    board.compile();
                     last_time_touched = TimeUtils.nanoTime();
                 }
             }
@@ -145,6 +146,7 @@ public class CircuitBuilderGame extends Game {
                         closestVertex.y);
                     if (!board.addComponent(component_instance))
                         System.out.println("Cannot Place Component!");
+                    board.compile();
                     last_time_touched = TimeUtils.nanoTime();
                 }
                 if (Gdx.input.isButtonPressed(Input.Buttons.RIGHT) && TimeUtils.nanoTime() - last_time_touched > cooldown) {
@@ -152,6 +154,8 @@ public class CircuitBuilderGame extends Game {
                     if (component_instance != null) {
                         board.removeComponent(component_instance);
                     }
+                    board.compile();
+                    last_time_touched = TimeUtils.nanoTime();
                 }
             }
         }

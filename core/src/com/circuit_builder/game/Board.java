@@ -268,7 +268,8 @@ public class Board {
         // renderVertexObjects(sr);
     }
 
-    public void simulate() {
+    public void simulate(Node root) {
+
     }
 
     public Node compile() {
@@ -298,6 +299,10 @@ public class Board {
                     if (!accounted_for.contains(v, false)){
                         accounted_for.add(v);
                         new_wire_entanglement.add(v);
+                        Component c1 = getComponent(endpoints[3], endpoints[2]);
+                        Component c2 = getComponent(endpoints[1], endpoints[0]);
+                        if (c1 != null && !new_entanglement.contains(c1, false)) new_entanglement.add(c1);
+                        if (c2 != null && !new_entanglement.contains(c2, false)) new_entanglement.add(c2);
                         Array<Wire> attached1 = getWiresFromCoordinate(endpoints[0], endpoints[1]);
                         Array<Wire> attached2 = getWiresFromCoordinate(endpoints[2], endpoints[3]);
                         Array<Wire> attached = new Array<Wire>(attached1.size + attached2.size);
@@ -319,10 +324,17 @@ public class Board {
         for (Array<Wire> entanglement : entangled_segments)
             System.out.println("Entaglement of size "+entanglement.size);
         System.out.println();
+        System.out.println("Entangled Components");
+        System.out.println("===============");
+        for (Array<Component> entanglement : entangled_components)
+            System.out.println("Entaglement of size "+entanglement.size);
+        System.out.println();
+        System.out.println();
         // iterate over every pair of groups of components
         for (int i = 0; i < entangled_components.size; i++) {
             for (int j = 0; j < entangled_components.size; j++) {
                 if (i == j) continue;
+                if (j > i) continue;
                 Array<Component> ca1 = entangled_components.get(i); 
                 Array<Component> ca2 = entangled_components.get(j);
                 Array<Component> overlap = new Array<Component>(ca1.size + ca2.size);
@@ -333,6 +345,7 @@ public class Board {
                 if (overlap.size == 1) {
                     //TODO
                     // Quest to the 6502
+                    
                 }
                 else if (overlap.size >= 2) {
 
