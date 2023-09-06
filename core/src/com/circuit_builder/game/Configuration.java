@@ -13,9 +13,12 @@ public class Configuration {
     public static final Color background_color = new Color(0.1f, 0.1f, 0.1f, 1f);
     public static final int default_wire_color = 1;
     public static final long cooldown = 200000000; //0.2 seconds
-    public static final Color default_segment_color = new Color(0.3f, 0.2f, 0.1f, 1f);
-    public static final Color default_segment_selected_color = new Color(0.4f, 0.3f, 0.2f, 1f);
+    public static final Color default_segment_color = new Color(0.3f, 0.3f, 0.3f, 1f);
+    public static final Color default_segment_selected_color = new Color(0.45f, 0.45f, 0.45f, 1f);
     public static final float brightness_increase_wire = 0.4f;
+
+    public static final Color getDefaultBoardColor = new Color(0.8f, 0.8f, 0.8f, 1f);
+    public static final Color getDefaultVertexColor = new Color(Color.GRAY);
 
     public static final int number_of_colors = 6;
     public static final Color color_map(int color_id) {

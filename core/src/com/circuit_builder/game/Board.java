@@ -29,13 +29,11 @@ public class Board {
 
     public Vertex[] vertices;
 
-    public static final Color getDefaultBoardColor = new Color(0.1f, 0.15f, 0.12f, 1f);
-    public static final Color getDefaultVertexColor = new Color(Color.GRAY);
 
     public Board(int width, int height) {
         this.width = width;
         this.height = height;
-        this.boardColor = getDefaultBoardColor;
+        this.boardColor = Configuration.getDefaultBoardColor;
         this.gridColor = Configuration.default_segment_color;
         this.components = new Array<Component>();
         this.vertices = new Vertex[this.height * this.width];
@@ -76,7 +74,7 @@ public class Board {
 
     public void renderVertexObjects(ShapeRenderer sr) {
         sr.begin(ShapeType.Filled);
-        sr.setColor(getDefaultVertexColor);
+        sr.setColor(Configuration.getDefaultVertexColor);
         for (Vertex v : vertices) {
             sr.circle(v.bounds.x, v.bounds.y, Configuration.grid_line_width);
         }

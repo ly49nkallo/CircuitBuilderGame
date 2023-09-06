@@ -129,7 +129,7 @@ public class CircuitBuilderGame extends Game {
                 int _width = Configuration.getWidthFromComponentID(selected_component);
                 int _height = Configuration.getHeightFromComponentID(selected_component);
                 sr.begin(ShapeType.Filled);
-                sr.setColor(Board.getDefaultVertexColor);
+                sr.setColor(Configuration.getDefaultVertexColor);
                 for (int i = 0; i < _width; i++) {
                     for (int j = 0; j < _height; j++) {
                         sr.circle(
