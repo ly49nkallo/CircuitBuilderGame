@@ -5,9 +5,9 @@ import java.util.Stack;
 import java.util.Queue;
 
 import com.badlogic.gdx.utils.Array;
-import com.circuit_builder.tree_utils.Node;
-import com.circuit_builder.tree_utils.Series;
-import com.circuit_builder.tree_utils.Parellel;
+import com.circuit_builder.graph_utils.Edge;
+import com.circuit_builder.graph_utils.Graph;
+import com.circuit_builder.graph_utils.Node;
 
 import java.util.Arrays;
 import com.badlogic.gdx.graphics.Color;
@@ -272,14 +272,14 @@ public class Board {
 
     }
 
-    public Node compile() {
+    public Graph compile() {
         /* Generate logical tree that represents circuit so we can simulate it */
 
         // for each wire
         //   if wire not in accounted for
         //      perform DFS on the wire to find all components attached to segment or it's neighbors
         //      store entangled components into array
-        Node root = new Series();
+        Graph graph = new Graph();
         Array<Segment> accounted_for = new Array<Segment>(this.height * this.width);
         Array<Array<Component>> entangled_components = new Array<Array<Component>>();
         Array<Array<Wire>> entangled_segments = new Array<Array<Wire>>();
@@ -318,40 +318,29 @@ public class Board {
                 entangled_segments.add(new_wire_entanglement);
             }
         }
-        System.out.println("accounted_for.size = "+accounted_for.size);
-        System.out.println("Entangled Wires");
-        System.out.println("===============");
-        for (Array<Wire> entanglement : entangled_segments)
-            System.out.println("Entaglement of size "+entanglement.size);
-        System.out.println();
-        System.out.println("Entangled Components");
-        System.out.println("===============");
-        for (Array<Component> entanglement : entangled_components)
-            System.out.println("Entaglement of size "+entanglement.size);
-        System.out.println();
-        System.out.println();
-        // iterate over every pair of groups of components
-        for (int i = 0; i < entangled_components.size; i++) {
-            for (int j = 0; j < entangled_components.size; j++) {
-                if (i == j) continue;
-                if (j > i) continue;
-                Array<Component> ca1 = entangled_components.get(i); 
-                Array<Component> ca2 = entangled_components.get(j);
-                Array<Component> overlap = new Array<Component>(ca1.size + ca2.size);
-                {for (Component c1 : ca1)
-                    for (Component c2 : ca2)
-                        if (c1 == c2) 
-                            overlap.add(c1);}
-                if (overlap.size == 1) {
-                    //TODO
-                    // Quest to the 6502
-                    
-                }
-                else if (overlap.size >= 2) {
-
+        for (Array<Component> ent : entangled_components) {
+            Array<Node<?>> node_array = new Array<Node<?>>(ent.size);
+            for (Component c : ent) {
+                Node<Component> node = new Node<Component>(c);
+                if (!node_array.contains(node, false)) {
+                    node_array.add(node);
                 }
             }
+            Array<Edge> edge_array = new Array<Edge>((node_array.size) * (node_array.size - 1) / 2 + 1);
+            for (int i = 0; i < node_array.size; i++) {
+                for (int j = 0; j < node_array.size; j++) {
+                    Node<?> n1 = node_array.get(i);
+                    Node<?> n2 = node_array.get(j);
+                    if (n1 == n2) continue;
+                    Edge edge = new Edge(false, n1, n2);
+                    if (!edge_array.contains(edge, false))
+                        edge_array.add(edge);
+                }
+            }
+            graph.addNodes(node_array);
+            graph.addEdges(edge_array);
         }
-        return new Series();
+        System.out.println(graph.repr());
+        return graph;
     }
 }
