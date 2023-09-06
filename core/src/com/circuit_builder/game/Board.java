@@ -15,6 +15,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.TimeUtils;
 
 public class Board {
     // GRID DIMENSIONS
@@ -268,17 +269,13 @@ public class Board {
         // renderVertexObjects(sr);
     }
 
-    public void simulate(Node root) {
-
+    public void simulate(Graph graph) {
+        
     }
 
     public Graph compile() {
-        /* Generate logical tree that represents circuit so we can simulate it */
-
-        // for each wire
-        //   if wire not in accounted for
-        //      perform DFS on the wire to find all components attached to segment or it's neighbors
-        //      store entangled components into array
+        /* Create Undirected Graph representing the structure of the circuit */
+        long start = TimeUtils.nanoTime();
         Graph graph = new Graph();
         Array<Segment> accounted_for = new Array<Segment>(this.height * this.width);
         Array<Array<Component>> entangled_components = new Array<Array<Component>>();
@@ -341,6 +338,7 @@ public class Board {
             graph.addEdges(edge_array);
         }
         System.out.println(graph.repr());
+        System.out.println("Compilation took " + (TimeUtils.nanoTime() - start) + " ns \n");
         return graph;
     }
 }
