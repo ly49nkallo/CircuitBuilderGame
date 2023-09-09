@@ -1,0 +1,8 @@
+[ ] Make UI better (!)
+[ ] Ability to simulate the circuit (we have to decide whether we will use real
+    simulation with kirchoff's laws or just binary)
+[ ] Add transistor component
+[ ] Add invertor component (NOT gate)
+[ ] Add ability to abstractify circuits
+[ ] Add menu screen
+[ ] Add soundtrack (low priority)

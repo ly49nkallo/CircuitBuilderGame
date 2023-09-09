@@ -7,7 +7,7 @@ public class Configuration {
     public static final int screen_width = 1300; // in pixels
     public static final int screen_height = 800; // in pixels
 
-    public static final float grid_line_width = (float) screen_width / 320; // in pixels
+    public static final float grid_line_width = (float) screen_width / 300; // in pixels
     public static final float grid_box_width = (float) screen_width / 40; // in pixels
     public static final float grid_box_height = (float) grid_box_width; // in pixels
     public static final Color background_color = new Color(0.1f, 0.1f, 0.1f, 1f);
