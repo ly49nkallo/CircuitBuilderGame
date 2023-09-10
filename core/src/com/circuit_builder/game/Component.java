@@ -15,15 +15,24 @@ public class Component {
     public Rectangle cachedBounds;
     public int rotation; // 0) UP 1) RIGHT 2) DOWN 3) LEFT
     public Texture texture;
+    public Pin[] pins;
+    public Board parent;
 
-    public double I, V, R;
-
-    public Component(int x, int y, int width, int height, String name, Texture texture) {
+    public Component(int x, int y, int width, int height, String name, Texture texture, Board parent) {
         this.x = x; this.y = y;
         this.width = width; this.height = height;
         this.name = name;
         this.rotation = 0;
         this.texture = texture;
+        this.parent = parent;
+        pins = new Pin[(this.width + 1) * (this.height + 1)];
+        int c = 0;
+        for(int i = x; i <= x + width; i++){
+            for (int j = y; j <= y + height; j++) {
+                pins[c] = new Pin(i, j, this);
+                c++;
+            }
+        }
     }
 
     public void render(ShapeRenderer sr, SpriteBatch sb, Board parent) {

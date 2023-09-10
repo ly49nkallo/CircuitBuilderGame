@@ -151,6 +151,20 @@ public class Board {
         return null;
     }
 
+    public Pin getPin(int x, int y) {
+        for (Component c : components) {
+            for (Pin p : c.pins) {
+                if (p.x == x && p.y == y)
+                    return p;
+            }
+        }
+        return null;
+    }
+
+    public Vertex getVertex(int x, int y) {
+        return this.vertices[(y * this.width) + x];
+    }
+
     public boolean addComponent(Component component) {
         if (component.x + component.width > this.width || component.y + component.height > this.height)
             return false;
@@ -276,14 +290,14 @@ public class Board {
         long start = TimeUtils.nanoTime();
         Graph graph = new Graph();
         Array<Segment> accounted_for = new Array<Segment>(this.height * this.width);
-        Array<Array<Component>> entangled_components = new Array<Array<Component>>();
+        Array<Array<Pin>> entangled_pins = new Array<Array<Pin>>();
         Array<Array<Wire>> entangled_segments = new Array<Array<Wire>>();
         for (int i = 0; i < this.segments.size; i++) {
             Segment seg = this.segments.get(i);
             if (seg instanceof Wire && !accounted_for.contains(seg, false)) {
                 //depth first search (maybe optimal maybe not... java stack is pretty sexy)
                 Stack<Wire> stack = new Stack<Wire>();
-                Array<Component> new_entanglement = new Array<Component>();
+                Array<Pin> new_entanglement = new Array<Pin>();
                 Array<Wire> new_wire_entanglement = new Array<Wire>();
                 Wire wire = (Wire) seg;
                 int color = wire.color_id;
@@ -294,8 +308,8 @@ public class Board {
                     if (!accounted_for.contains(v, false)){
                         accounted_for.add(v);
                         new_wire_entanglement.add(v);
-                        Component c1 = getComponent(endpoints[3], endpoints[2]);
-                        Component c2 = getComponent(endpoints[1], endpoints[0]);
+                        Pin c1 = getPin(endpoints[2], endpoints[3]);
+                        Pin c2 = getPin(endpoints[0], endpoints[1]);
                         if (c1 != null && !new_entanglement.contains(c1, false)) new_entanglement.add(c1);
                         if (c2 != null && !new_entanglement.contains(c2, false)) new_entanglement.add(c2);
                         Array<Wire> attached1 = getWiresFromCoordinate(endpoints[0], endpoints[1]);
@@ -309,14 +323,14 @@ public class Board {
                         }
                     }
                 }
-                entangled_components.add(new_entanglement);
+                entangled_pins.add(new_entanglement);
                 entangled_segments.add(new_wire_entanglement);
             }
         }
-        for (Array<Component> ent : entangled_components) {
+        for (Array<Pin> ent : entangled_pins) {
             Array<Node<?>> node_array = new Array<Node<?>>(ent.size);
-            for (Component c : ent) {
-                Node<Component> node = new Node<Component>(c);
+            for (Pin p : ent) {
+                Node<Pin> node = new Node<Pin>(p);
                 if (!node_array.contains(node, false)) {
                     node_array.add(node);
                 }

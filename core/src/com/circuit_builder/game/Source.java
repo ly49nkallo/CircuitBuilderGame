@@ -10,8 +10,8 @@ import com.badlogic.gdx.math.Rectangle;
 public class Source extends Component{
     public static Texture s_texture = new Texture(Gdx.files.internal("assets/Source.png"));
 
-    public Source(int x, int y) {
-        super(x, y, Configuration.battery_width, Configuration.battery_height, "Source", Source.s_texture);
+    public Source(int x, int y, Board parent) {
+        super(x, y, Configuration.battery_width, Configuration.battery_height, "Source", Source.s_texture, parent);
     }
     /* obsolete */
     public static void render_sprite(ShapeRenderer sr, SpriteBatch sb, float x, float y) {

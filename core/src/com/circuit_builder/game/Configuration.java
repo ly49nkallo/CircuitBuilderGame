@@ -94,9 +94,9 @@ public class Configuration {
     public static Component getComponentInstanceFromComponentID(int component_id, int x, int y) {
         switch(component_id) {
             case 1:
-                return new Source(x, y);
+                return new Source(x, y, null);
             case 2:
-                return new Resistor(x, y);
+                return new Resistor(x, y, null);
             default:
                 return null;
         }
