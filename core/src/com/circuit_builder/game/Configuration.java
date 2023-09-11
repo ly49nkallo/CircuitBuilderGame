@@ -101,4 +101,5 @@ public class Configuration {
                 return null;
         }
     }
+    public static Color simulationBackgroundColor = new Color(0.1f, 0.2f, 0.1f, 1f);
 }

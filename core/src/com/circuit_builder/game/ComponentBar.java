@@ -1,12 +1,10 @@
 package com.circuit_builder.game;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g3d.particles.ParticleShader.Config;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
 
 public class ComponentBar {
     float x, y;
@@ -37,7 +35,6 @@ public class ComponentBar {
     }
 
     public void render(ShapeRenderer sr, SpriteBatch sb, int selected_component) {
-        Rectangle bounds = getBoundingBox(); 
         // selected box
         sr.begin(ShapeType.Filled);
         sr.setColor(Color.WHITE);

@@ -1,8 +1,6 @@
 package com.circuit_builder.game;
 
-import java.util.Iterator;
 import java.util.Stack;
-import java.util.Queue;
 
 import com.badlogic.gdx.utils.Array;
 import com.circuit_builder.graph_utils.Edge;
@@ -17,6 +15,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.TimeUtils;
 
+import com.circuit_builder.graph_utils.Graph;
+
 public class Board {
     // GRID DIMENSIONS
     public int width;
@@ -29,6 +29,7 @@ public class Board {
     public Array<Segment> segments;
 
     public Vertex[] vertices;
+    public Graph<Pin, Array<Wire>> mostRecentCompilation;
 
 
     public Board(int width, int height) {
@@ -64,11 +65,11 @@ public class Board {
         }
     }
 
-    public void renderSegments(ShapeRenderer sr) {
+    public void renderSegments(ShapeRenderer sr, boolean simulationMode) {
         sr.begin(ShapeType.Filled);
         sr.setColor(gridColor);
         for (Segment s : segments) {
-            s.render(sr, this);
+            s.render(sr, this, simulationMode);
         }
         sr.end();
     }
@@ -246,7 +247,7 @@ public class Board {
         Vertex closestVertex = vertices[lowestIdx];
         return closestVertex;
     }
-    //@TODO add wires remove segment behavior
+
     public void setLocation(float x, float y) {
         this.x = x;
         this.y = y;
@@ -264,31 +265,41 @@ public class Board {
         return new Rectangle((float) x, (float) y, (float) grid_dims[0], (float) grid_dims[1]);
     }
 
-    public void renderBackground(ShapeRenderer sr) {
+    public void renderBackground(ShapeRenderer sr, boolean simulationMode) {
         sr.begin(ShapeType.Filled);
         // draw background
-        sr.setColor(this.boardColor);
+        if (simulationMode) {
+            sr.setColor(Configuration.simulationBackgroundColor);
+        }
+        else {
+            sr.setColor(this.boardColor);
+        }
         sr.rect((float) x, (float) y, getGridDimensions()[0], getGridDimensions()[1]);
         sr.end();
     }
 
-    public void render(ShapeRenderer sr, SpriteBatch sb) {
-        renderBackground(sr);
-        renderSegments(sr);
+    public void render(ShapeRenderer sr, SpriteBatch sb, boolean simulationMode) {
+        renderBackground(sr, simulationMode);
+        renderSegments(sr, simulationMode);
         for (Component c: components) {
             c.render(sr, sb, this);
         }
         // renderVertexObjects(sr);
     }
 
-    public void simulate(Graph graph) {
-        
+    public void simulate() {
+        if (this.mostRecentCompilation == null) 
+            return;
+        Graph<Pin, Array<Wire>> g = this.mostRecentCompilation;
+        for (Edge<Array<Wire>> edge : g.edges) {
+            
+        }
     }
 
-    public Graph compile() {
+    public Graph<Pin, Array<Wire>> compile() {
         /* Create Undirected Graph representing the structure of the circuit */
         long start = TimeUtils.nanoTime();
-        Graph graph = new Graph();
+        Graph<Pin, Array<Wire>> graph = new Graph<Pin, Array<Wire>>();
         Array<Segment> accounted_for = new Array<Segment>(this.height * this.width);
         Array<Array<Pin>> entangled_pins = new Array<Array<Pin>>();
         Array<Array<Wire>> entangled_segments = new Array<Array<Wire>>();
@@ -327,27 +338,34 @@ public class Board {
                 entangled_segments.add(new_wire_entanglement);
             }
         }
-        for (Array<Pin> ent : entangled_pins) {
-            Array<Node<?>> node_array = new Array<Node<?>>(ent.size);
+        System.out.println("DFS search took " + (TimeUtils.nanoTime() - start) + " ns");
+        for (int i = 0; i < entangled_pins.size; i++) {
+            Array<Pin> ent = entangled_pins.get(i);
+            Array<Wire> wires = entangled_segments.get(i);
+            Array<Node<Pin>> node_array = new Array<Node<Pin>>(ent.size);
             for (Pin p : ent) {
                 Node<Pin> node = new Node<Pin>(p);
                 if (!node_array.contains(node, false)) {
                     node_array.add(node);
                 }
             }
-            Array<Edge> edge_array = new Array<Edge>((node_array.size) * (node_array.size - 1) / 2 + 1);
-            for (int i = 0; i < node_array.size; i++) {
+            Array<Edge<Array<Wire>>> edge_array = new Array<Edge<Array<Wire>>>((node_array.size) * (node_array.size - 1) / 2 + 1);
+            for (int z = 0; z < node_array.size; z++) {
                 for (int j = 0; j < node_array.size; j++) {
-                    Node<?> n1 = node_array.get(i);
+                    Node<?> n1 = node_array.get(z);
                     Node<?> n2 = node_array.get(j);
                     if (n1 == n2) continue;
-                    Edge edge = new Edge(false, n1, n2);
+                    Edge<Array<Wire>> edge = new Edge<Array<Wire>>(wires, false, n1, n2);
                     if (!edge_array.contains(edge, false))
                         edge_array.add(edge);
                 }
             }
-            graph.addNodes(node_array);
-            graph.addEdges(edge_array);
+            for (Node<Pin> n : node_array) {
+                graph.addNode(n);
+            }
+            for (Edge<Array<Wire>> e : edge_array) {
+                graph.addEdge(e);
+            }
         }
         System.out.println(graph.repr());
         System.out.println("Compilation took " + (TimeUtils.nanoTime() - start) + " ns \n");

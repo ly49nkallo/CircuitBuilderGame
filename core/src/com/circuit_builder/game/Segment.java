@@ -14,7 +14,7 @@ public class Segment {
         this.x2 = x2; this.y2 = y2;
         color_id = 0;
     }
-    public Color getColor() {
+    public Color getColor(boolean simulationMode) {
         return Configuration.default_segment_color;
     }
     public Color getSelectedColor() {
@@ -33,8 +33,8 @@ public class Segment {
         return out;
     }
 
-    public void render(ShapeRenderer sr, Board parent) {
-        sr.setColor(getColor());
+    public void render(ShapeRenderer sr, Board parent, boolean simulationMode) {
+        sr.setColor(getColor(simulationMode));
         float[] coords = getScreenSpaceCoordinatesForEndpoints(parent.x, parent.y);
         sr.rectLine(coords[0], coords[1],
                     coords[2], coords[3],
@@ -50,6 +50,7 @@ public class Segment {
                     Configuration.grid_line_width);
         sr.end();
     }
+
 
     public int[] getEndpoints() {
         return new int[] {x1, y1, x2, y2};

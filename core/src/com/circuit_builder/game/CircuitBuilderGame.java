@@ -1,7 +1,5 @@
 package com.circuit_builder.game;
 
-import java.sql.Time;
-import java.util.Iterator;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -10,7 +8,6 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g3d.particles.ParticleShader.Config;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
@@ -22,6 +19,10 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.Input;
+
+import com.circuit_builder.graph_utils.Graph;
+import com.circuit_builder.graph_utils.Edge;
+import com.circuit_builder.graph_utils.Node;
 
 // public static final int screen_width = 800; // in pixels
 // public static final int screen_height = 480; // in pixels
@@ -44,6 +45,7 @@ public class CircuitBuilderGame extends Game {
     public int selected_component;
     public long last_time_touched;
     public int clock;
+    public boolean simulationMode;
     
     @Override
     public void create () {
@@ -71,6 +73,7 @@ public class CircuitBuilderGame extends Game {
             Configuration.screen_height - (Configuration.number_of_components * 100f)
         );
         this.last_ptrX = 0; this.last_ptrY = 0;
+        simulationMode = false;
     }
 
     @Override
@@ -90,72 +93,82 @@ public class CircuitBuilderGame extends Game {
         ptrX = touchPosition.x; 
         ptrY = touchPosition.y; 
         /* BOARD */
-        this.board.render(sr, sb);
-        if (board.getBoundingBox().contains(ptrX, ptrY)){
-            if (selected_color != -1) {
-                Segment closestSegment;
-                if (last_ptrX == ptrX && last_ptrY == ptrY && last_segment != null) {
-                    closestSegment = last_segment;
-                }
-                else {
-                    closestSegment = board.getClosestSegment(ptrX, ptrY);
-                    last_segment = closestSegment;
-                }
-                closestSegment.selectedRender(sr, board); // mouseover select render
-                if (Gdx.input.isButtonPressed(Input.Buttons.LEFT) && TimeUtils.nanoTime() - last_time_touched > cooldown) {
-                    board.segments.removeValue(closestSegment, false);
-                    board.segments.add(new Wire(selected_color, closestSegment.x1, closestSegment.y1, closestSegment.x2, closestSegment.y2));
-                    board.compile();
-                    last_time_touched = TimeUtils.nanoTime();
-                }
-                if (Gdx.input.isButtonPressed(Input.Buttons.RIGHT) && TimeUtils.nanoTime() - last_time_touched > cooldown) {
-                    board.segments.removeValue(closestSegment, false);
-                    board.segments.add(new Segment(closestSegment.x1, closestSegment.y1, closestSegment.x2, closestSegment.y2));
-                    board.compile();
-                    last_time_touched = TimeUtils.nanoTime();
-                }
+        // detect simulation mode
+        if (Gdx.input.isKeyPressed(Input.Keys.S) && TimeUtils.nanoTime() - last_time_touched > cooldown){
+            this.simulationMode = ! this.simulationMode;
+            if (this.simulationMode) {
+                Graph graph;
+                graph = board.compile();
+                board.mostRecentCompilation = graph;
+                board.paintSegments();
             }
-            // place component
-            else if (selected_component != -1) {
-                 // render vertexes
-                Vertex closestVertex;
-                if (last_ptrX == ptrX && last_ptrY == ptrY && last_vertex != null) {
-                    closestVertex = last_vertex;
-                }
-                else {
-                    closestVertex = board.getClosestVertex(ptrX, ptrY);
-                    last_vertex = closestVertex;
-                }
-                int _width = Configuration.getWidthFromComponentID(selected_component);
-                int _height = Configuration.getHeightFromComponentID(selected_component);
-                sr.begin(ShapeType.Filled);
-                sr.setColor(Configuration.getDefaultVertexColor);
-                for (int i = 0; i < _width; i++) {
-                    for (int j = 0; j < _height; j++) {
-                        sr.circle(
-                            closestVertex.bounds.x + ((float) i * Configuration.grid_box_width),
-                            closestVertex.bounds.y + ((float) j * Configuration.grid_box_height), 
-                            Configuration.grid_line_width);
+            last_time_touched = TimeUtils.nanoTime();
+
+        }
+        this.board.render(sr, sb, this.simulationMode);
+        if (! this.simulationMode) {
+            if (board.getBoundingBox().contains(ptrX, ptrY)){
+                if (selected_color != -1) {
+                    Segment closestSegment;
+                    if (last_ptrX == ptrX && last_ptrY == ptrY && last_segment != null) {
+                        closestSegment = last_segment;
+                    }
+                    else {
+                        closestSegment = board.getClosestSegment(ptrX, ptrY);
+                        last_segment = closestSegment;
+                    }
+                    closestSegment.selectedRender(sr, board); // mouseover select render
+                    if (Gdx.input.isButtonPressed(Input.Buttons.LEFT) && TimeUtils.nanoTime() - last_time_touched > cooldown) {
+                        board.segments.removeValue(closestSegment, false);
+                        board.segments.add(new Wire(selected_color, closestSegment.x1, closestSegment.y1, closestSegment.x2, closestSegment.y2));
+                        last_time_touched = TimeUtils.nanoTime();
+                    }
+                    if (Gdx.input.isButtonPressed(Input.Buttons.RIGHT) && TimeUtils.nanoTime() - last_time_touched > cooldown) {
+                        board.segments.removeValue(closestSegment, false);
+                        board.segments.add(new Segment(closestSegment.x1, closestSegment.y1, closestSegment.x2, closestSegment.y2));
+                        last_time_touched = TimeUtils.nanoTime();
                     }
                 }
-                sr.end();
-                if (Gdx.input.isButtonPressed(Input.Buttons.LEFT) && TimeUtils.nanoTime() - last_time_touched > cooldown) {
-                    Component component_instance = Configuration.getComponentInstanceFromComponentID(
-                        selected_component,
-                        closestVertex.x,
-                        closestVertex.y);
-                    if (!board.addComponent(component_instance))
-                        System.out.println("Cannot Place Component!");
-                    board.compile();
-                    last_time_touched = TimeUtils.nanoTime();
-                }
-                if (Gdx.input.isButtonPressed(Input.Buttons.RIGHT) && TimeUtils.nanoTime() - last_time_touched > cooldown) {
-                    Component component_instance = board.getComponent(closestVertex.y, closestVertex.x);
-                    if (component_instance != null) {
-                        board.removeComponent(component_instance);
+                // place component
+                else if (selected_component != -1) {
+                    // render vertexes
+                    Vertex closestVertex;
+                    if (last_ptrX == ptrX && last_ptrY == ptrY && last_vertex != null) {
+                        closestVertex = last_vertex;
                     }
-                    board.compile();
-                    last_time_touched = TimeUtils.nanoTime();
+                    else {
+                        closestVertex = board.getClosestVertex(ptrX, ptrY);
+                        last_vertex = closestVertex;
+                    }
+                    int _width = Configuration.getWidthFromComponentID(selected_component);
+                    int _height = Configuration.getHeightFromComponentID(selected_component);
+                    sr.begin(ShapeType.Filled);
+                    sr.setColor(Configuration.getDefaultVertexColor);
+                    for (int i = 0; i < _width; i++) {
+                        for (int j = 0; j < _height; j++) {
+                            sr.circle(
+                                closestVertex.bounds.x + ((float) i * Configuration.grid_box_width),
+                                closestVertex.bounds.y + ((float) j * Configuration.grid_box_height), 
+                                Configuration.grid_line_width);
+                        }
+                    }
+                    sr.end();
+                    if (Gdx.input.isButtonPressed(Input.Buttons.LEFT) && TimeUtils.nanoTime() - last_time_touched > cooldown) {
+                        Component component_instance = Configuration.getComponentInstanceFromComponentID(
+                            selected_component,
+                            closestVertex.x,
+                            closestVertex.y);
+                        if (!board.addComponent(component_instance))
+                            System.out.println("Cannot Place Component!");
+                        last_time_touched = TimeUtils.nanoTime();
+                    }
+                    if (Gdx.input.isButtonPressed(Input.Buttons.RIGHT) && TimeUtils.nanoTime() - last_time_touched > cooldown) {
+                        Component component_instance = board.getComponent(closestVertex.y, closestVertex.x);
+                        if (component_instance != null) {
+                            board.removeComponent(component_instance);
+                        }
+                        last_time_touched = TimeUtils.nanoTime();
+                    }
                 }
             }
         }

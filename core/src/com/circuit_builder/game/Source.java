@@ -2,10 +2,6 @@ package com.circuit_builder.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Rectangle;
 
 public class Source extends Component{
     public static Texture s_texture = new Texture(Gdx.files.internal("assets/Source.png"));
@@ -14,10 +10,10 @@ public class Source extends Component{
         super(x, y, Configuration.battery_width, Configuration.battery_height, "Source", Source.s_texture, parent);
     }
     /* obsolete */
-    public static void render_sprite(ShapeRenderer sr, SpriteBatch sb, float x, float y) {
-        Component.render_sprite_background(sr, x, y);
-        sb.begin();
-        sb.draw(s_texture, x, y, Configuration.component_sprite_width, Configuration.component_sprite_width);
-        sb.end();
-    }
+    // public static void render_sprite(ShapeRenderer sr, SpriteBatch sb, float x, float y) {
+    //     Component.render_sprite_background(sr, x, y);
+    //     sb.begin();
+    //     sb.draw(s_texture, x, y, Configuration.component_sprite_width, Configuration.component_sprite_width);
+    //     sb.end();
+    // }
 }
