@@ -13,7 +13,8 @@ public class Source extends Component{
 
     @Override
     public void simulate() {
-        this.pins[0].active = true;
+        this.pins[2].active = true;
+        this.pins[5].active = true;
     }
     /* obsolete */
     // public static void render_sprite(ShapeRenderer sr, SpriteBatch sb, float x, float y) {

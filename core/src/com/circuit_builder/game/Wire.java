@@ -34,8 +34,6 @@ public class Wire extends Segment{
             return Configuration.color_map(this.color_id);
     }
 
-
-
     @Override
     public Color getSelectedColor() {
         Color c = getColor(false);

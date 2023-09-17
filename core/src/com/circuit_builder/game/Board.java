@@ -7,6 +7,7 @@ import com.circuit_builder.graph_utils.Edge;
 import com.circuit_builder.graph_utils.Graph;
 import com.circuit_builder.graph_utils.Node;
 
+import java.net.CookieHandler;
 import java.util.Arrays;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -95,7 +96,8 @@ public class Board {
 
     public Segment getSegment(int[] endpoints) {
         int[] endpoints_reversed = new int[] {endpoints[2], endpoints[3], endpoints[0], endpoints[1]};
-        for (Segment s : segments) {
+        for (int i = 0; i < segments.size; i++) {
+            Segment s = segments.get(i);
             if (Arrays.equals(s.getEndpoints(), endpoints) || Arrays.equals(s.getEndpoints(), endpoints_reversed)){
                 return s;
             }
@@ -103,8 +105,16 @@ public class Board {
         return null;
     }
 
+    public Wire getWire(int[] endpoints) {
+        Segment s = getSegment(endpoints);
+        if (s instanceof Wire) {
+            return (Wire) s;
+        }
+        return null;
+    }
+
     public Array<Segment> getSegmentsFromCoordinate(int x, int y) {
-        Array<Segment> out = new Array<Segment>(4);
+        Array<Segment> out = new Array<Segment>();
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
                 if ((i != 0 && j != 0) || (i == 0 && j == 0)) continue;
@@ -127,7 +137,7 @@ public class Board {
 
     public Array<Wire> getWiresFromCoordinate(int x, int y) {
         Array<Segment> segments = getSegmentsFromCoordinate(x, y);
-        Array<Wire> out = new Array<Wire>(4);
+        Array<Wire> out = new Array<Wire>();
         for (Segment s : segments) {
             if (s instanceof Wire)
                 out.add((Wire) s);
@@ -287,24 +297,78 @@ public class Board {
         // renderVertexObjects(sr);
     }
     public void simulate() {
-        // activate all source pins
+        System.out.println("Simulating...");
+        for (Segment s : segments) {
+            if (s instanceof Wire) {
+                Wire w = (Wire) s;
+                w.active = false;
+            }
+        }
+        for (Component c : components) {
+            for (Pin p : c.pins) {
+                p.active = false;
+            }
+        }
         int i = 0;
-        do {
+        while (i < 100) {
+            System.out.println("Simulation Step");
             for (Component c: this.components) {
                 c.simulate();
-                System.out.println(c.pins[0].active);
             }
+            // flood fill wires and pins
             for (Segment s : segments) {
                 if (s instanceof Wire) {
                     Wire w = (Wire) s;
-                    
-
+                    if (w.active) {
+                        int[] endpoints = w.getEndpoints();
+                        Array<Wire> attached = getAttached(endpoints);
+                        for (Wire a : attached) {
+                            if (a.color_id == w.color_id && w != a && !a.active) {
+                                a.active = true;
+                                System.out.println("Changed wire state 1");
+                            }
+                        } 
+                        Pin p1 = getPin(endpoints[0], endpoints[1]);
+                        if (p1 != null && !p1.active) {
+                            p1.active = true;
+                            System.out.println("Changed pin state");
+                        }
+                        Pin p2 = getPin(endpoints[2], endpoints[3]);
+                        if (p2 != null && !p2.active) {
+                            p2.active = true;
+                            System.out.println("Changed pin state");
+                        }
+                    }
                 }
             }
-    i++;
-        } while (i < 100);
+            for (Component c : this.components) {
+                for (Pin p : c.pins) {
+                    if (p.active) {
+                        Array<Wire> attached = getWiresFromCoordinate(p.x, p.y);
+                        for (Wire a : attached) {
+                            if (!a.active) {
+                                a.active = true;
+                                System.out.println("Changed wire state 2");
+                            }
+                        }
+                    }
+                }
+            }
+            i++;
+        }
+        printSummary();
     }
-
+    public Array<Wire> getAttached(int[] endpoints) {
+        Wire w = getWire(endpoints);
+        Array<Wire> attached1 = getWiresFromCoordinate(endpoints[0], endpoints[1]);
+        attached1.removeValue(w, false);
+        Array<Wire> attached2 = getWiresFromCoordinate(endpoints[2], endpoints[3]);
+        attached2.removeValue(w, false);
+        Array<Wire> attached = new Array<Wire>(attached1.size + attached2.size);
+        attached.addAll(attached1);
+        attached.addAll(attached2);
+        return attached;
+    }
 
     // public void simulate() {
     //     if (this.mostRecentCompilation == null) 
@@ -345,8 +409,8 @@ public class Board {
     //                     Array<Wire> attached1 = getWiresFromCoordinate(endpoints[0], endpoints[1]);
     //                     Array<Wire> attached2 = getWiresFromCoordinate(endpoints[2], endpoints[3]);
     //                     Array<Wire> attached = new Array<Wire>(attached1.size + attached2.size);
-    //                     attached.addAll(attached1);
-    //                     attached.addAll(attached2);
+    //                     attached.addall(attached1);
+    //                     attached.addall(attached2);
     //                     for (Wire s1 : attached) {
     //                         if (s1 != v && s1.color_id == color)
     //                             stack.push(s1);
@@ -390,4 +454,29 @@ public class Board {
     //     System.out.println("Compilation took " + (TimeUtils.nanoTime() - start) + " ns \n");
     //     return graph;
     // }
+    public void printSummary() {
+        System.out.println("Summary:");
+        for (Segment s : segments) {
+            if (s instanceof Wire) {
+                Wire w = (Wire) s;
+                int[] endpoints = w.getEndpoints();
+                System.out.print("(Wire)");
+                for (int pt : endpoints) {
+                    System.out.print(pt + " ");
+                }
+                if (w.active)
+                    System.out.print("(Active)");
+                else   
+                    System.out.print("(Not Active)");
+
+                Array<Wire> attached1 = getWiresFromCoordinate(endpoints[0], endpoints[1]);
+                Array<Wire> attached2 = getWiresFromCoordinate(endpoints[2], endpoints[3]); // TROUB>E
+                Array<Wire> attached = new Array<Wire>(attached1.size + attached2.size);
+                attached.addAll(attached1);
+                attached.addAll(attached2);
+                System.out.print("Conn: " + attached.size);
+                System.out.print('\n');
+            }
+        }
+    }
 }

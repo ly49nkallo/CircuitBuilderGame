@@ -23,16 +23,16 @@ public class Component {
         this.rotation = 0;
         this.texture = texture;
         this.parent = parent;
-        pins = new Pin[(this.width + 1) * (this.height + 1)];
+        pins = new Pin[this.width * this.height];
         int c = 0;
-        for(int i = x; i <= x + width; i++){
-            for (int j = y; j <= y + height; j++) {
+        for(int i = x; i < x + width; i++){
+            for (int j = y; j < y + height; j++) {
                 pins[c] = new Pin(i, j, this);
                 c++;
             }
         }
     }
-    
+
     public void simulate() {}
 
     public void render(ShapeRenderer sr, SpriteBatch sb, Board parent) {
