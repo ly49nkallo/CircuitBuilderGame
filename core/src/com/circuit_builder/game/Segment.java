@@ -3,6 +3,7 @@ package com.circuit_builder.game;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.graphics.Color;
+import java.util.Arrays;
 
 public class Segment {
     int x1, y1, x2, y2;
@@ -17,6 +18,17 @@ public class Segment {
     public Color getColor(boolean simulationMode) {
         return Configuration.default_segment_color;
     }
+    @Override 
+    public boolean equals(Object other) {
+        if (!(other instanceof Segment)) {
+            return false;
+        }
+        Segment otherSegment = (Segment) other;
+        int[] endpoints = this.getEndpoints();
+        int[] endpoints_reversed = new int[] {endpoints[2], endpoints[3], endpoints[0], endpoints[1]};
+        return Arrays.equals(endpoints, otherSegment.getEndpoints()) || Arrays.equals(endpoints_reversed, otherSegment.getEndpoints());
+    }
+
     public Color getSelectedColor() {
         return Configuration.default_segment_selected_color;
     }

@@ -469,11 +469,7 @@ public class Board {
                 else   
                     System.out.print("(Not Active)");
 
-                Array<Wire> attached1 = getWiresFromCoordinate(endpoints[0], endpoints[1]);
-                Array<Wire> attached2 = getWiresFromCoordinate(endpoints[2], endpoints[3]); // TROUB>E
-                Array<Wire> attached = new Array<Wire>(attached1.size + attached2.size);
-                attached.addAll(attached1);
-                attached.addAll(attached2);
+                Array<Wire> attached = getAttached(endpoints);
                 System.out.print("Conn: " + attached.size);
                 System.out.print('\n');
             }
