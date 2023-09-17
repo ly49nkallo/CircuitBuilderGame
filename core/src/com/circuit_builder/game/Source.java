@@ -8,6 +8,12 @@ public class Source extends Component{
 
     public Source(int x, int y, Board parent) {
         super(x, y, Configuration.battery_width, Configuration.battery_height, "Source", Source.s_texture, parent);
+
+    }
+
+    @Override
+    public void simulate() {
+        this.pins[0].active = true;
     }
     /* obsolete */
     // public static void render_sprite(ShapeRenderer sr, SpriteBatch sb, float x, float y) {

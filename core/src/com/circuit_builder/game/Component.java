@@ -32,6 +32,8 @@ public class Component {
             }
         }
     }
+    
+    public void simulate() {}
 
     public void render(ShapeRenderer sr, SpriteBatch sb, Board parent) {
         sr.begin(ShapeType.Filled);

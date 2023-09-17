@@ -97,10 +97,7 @@ public class CircuitBuilderGame extends Game {
         if (Gdx.input.isKeyPressed(Input.Keys.S) && TimeUtils.nanoTime() - last_time_touched > cooldown){
             this.simulationMode = ! this.simulationMode;
             if (this.simulationMode) {
-                Graph graph;
-                graph = board.compile();
-                board.mostRecentCompilation = graph;
-                board.paintSegments();
+                this.board.simulate();
             }
             last_time_touched = TimeUtils.nanoTime();
 
