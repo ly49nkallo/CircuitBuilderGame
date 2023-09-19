@@ -15,14 +15,16 @@ public class Component {
     public Texture texture;
     public Pin[] pins;
     public Board parent;
+    public int id;
 
-    public Component(int x, int y, int width, int height, String name, Texture texture, Board parent) {
+    public Component(int x, int y, int width, int height, String name, Texture texture, Board parent, int id) {
         this.x = x; this.y = y;
         this.width = width; this.height = height;
         this.name = name;
         this.rotation = 0;
         this.texture = texture;
         this.parent = parent;
+        this.id = id;
         pins = new Pin[this.width * this.height];
         int c = 0;
         for(int i = x; i < x + width; i++){
