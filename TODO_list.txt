@@ -3,7 +3,7 @@
     simulation with kirchoff's laws or just binary)
 
 [X] Add Source
-[ ] Add AND gate
+[X] Add AND gate
 [ ] Add invertor component (NOT gate)
 [ ] Add OR gate
 [ ] Add XOR gate
