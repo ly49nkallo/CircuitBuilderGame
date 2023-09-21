@@ -62,15 +62,19 @@ public class Configuration {
     public static final int and_gate_height = 2;
 
 
+    public static final int not_gate_width = 1;
+    public static final int not_gate_height = 2;
     /* I hate this shit */
 
-    public static final int number_of_components = 2;
+    public static final int number_of_components = 3;
     public static Texture getTextureFromComponentID(int component_id) {
         switch(component_id) {
             case 1:
                 return Source.s_texture;
             case 2:
-                return Source.s_texture;
+                return AndGate.s_texture;
+            case 3:
+                return NotGate.s_texture;
             default:
                 return null;
         }
@@ -81,6 +85,8 @@ public class Configuration {
                 return battery_width;
             case 2:
                 return and_gate_width;
+            case 3:
+                return not_gate_width;
             default:
                 return -1;
         }
@@ -91,6 +97,8 @@ public class Configuration {
                 return battery_height;
             case 2:
                 return and_gate_height;
+            case 3:
+                return not_gate_height;
             default:
                 return -1;
         }
@@ -101,6 +109,8 @@ public class Configuration {
                 return new Source(x, y, null);
             case 2:
                 return new AndGate(x, y, null);
+            case 3:
+                return new NotGate(x, y, null);
             default:
                 return null;
         }

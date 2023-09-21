@@ -312,34 +312,9 @@ public class Board {
         int i = 0;
         while (i < 100) {
             System.out.println("Simulation Step");
+            // flood fill wires and pins
             for (Component c: this.components) {
                 c.simulate();
-            }
-            // flood fill wires and pins
-            for (Segment s : segments) {
-                if (s instanceof Wire) {
-                    Wire w = (Wire) s;
-                    if (w.active) {
-                        int[] endpoints = w.getEndpoints();
-                        Array<Wire> attached = getAttached(endpoints);
-                        for (Wire a : attached) {
-                            if (a.color_id == w.color_id && w != a && !a.active) {
-                                a.active = true;
-                                System.out.println("Changed wire state 1");
-                            }
-                        } 
-                        Pin p1 = getPin(endpoints[0], endpoints[1]);
-                        if (p1 != null && !p1.active) {
-                            p1.active = true;
-                            System.out.println("Changed pin state");
-                        }
-                        Pin p2 = getPin(endpoints[2], endpoints[3]);
-                        if (p2 != null && !p2.active) {
-                            p2.active = true;
-                            System.out.println("Changed pin state");
-                        }
-                    }
-                }
             }
             for (Component c : this.components) {
                 for (Pin p : c.pins) {
@@ -353,6 +328,34 @@ public class Board {
                         }
                     }
                 }
+            }
+            for (Segment s : segments) {
+                if (s instanceof Wire) {
+                    Wire w = (Wire) s;
+                    if (w.active) {
+                        int[] endpoints = w.getEndpoints();
+                        Array<Wire> attached = getAttached(endpoints);
+                        for (Wire a : attached) {
+                            if (a.color_id == w.color_id && w != a && !a.active) {
+                                a.active = true;
+                                System.out.println("Changed wire state 1");
+                            }
+                        } 
+                        Pin p1 = getPin(endpoints[0], endpoints[1]);
+                        if (p1 != null && p1.mutable && !p1.active) {
+                            p1.active = true;
+                            System.out.println("Changed pin state 1" + " " + p1.x + " " + p1.y);
+                        }
+                        Pin p2 = getPin(endpoints[2], endpoints[3]);
+                        if (p2 != null && p2.mutable && !p2.active) {
+                            p2.active = true;
+                            System.out.println("Changed pin state 2");
+                        }
+                    }
+                }
+            }
+            for (Component c: this.components) {
+                c.simulate();
             }
             i++;
         }
@@ -472,6 +475,15 @@ public class Board {
                 Array<Wire> attached = getAttached(endpoints);
                 System.out.print("Conn: " + attached.size);
                 System.out.print('\n');
+            }
+        }
+        for (Component c : components) {
+            System.out.println("(Component) " + c.name);
+            for (Pin p : c.pins) {
+                if (p.active)
+                    System.out.println("    " + "(Pin) " + p.x + " " + p.y + "(Active)");
+                else
+                    System.out.println("    " + "(Pin) " + p.x + " " + p.y + "(Not Active)");
             }
         }
     }

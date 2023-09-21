@@ -7,18 +7,18 @@ public class NotGate extends Component{
     public static Texture s_texture = new Texture(Gdx.files.internal("assets/Source.png"));
 
     public NotGate(int x, int y, Board parent) {
-        super(x, y, Configuration.and_gate_width, Configuration.and_gate_height, "AND", Source.s_texture, parent, 2);
+        super(x, y, Configuration.not_gate_width, Configuration.not_gate_height, "NOT", NotGate.s_texture, parent, 3);
+        this.pins[1].mutable = false;
     }
 
     @Override
     public void simulate() {
-        if (this.pins[0].active && this.pins[2].active) {
-            this.pins[1].active = true;
-            this.pins[3].active = true;
+         if (this.pins[0].active && true) {
+            this.pins[1].active = false;
         }
         else {
-            this.pins[1].active = false;
-            this.pins[3].active = false;
+            this.pins[1].active = true;
         }
+
     }
 }

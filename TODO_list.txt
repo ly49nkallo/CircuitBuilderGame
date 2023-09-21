@@ -14,3 +14,7 @@
 [ ] Add ability to abstractify circuits
 [ ] Add menu screen
 [ ] Add soundtrack (low priority)
+
+BUGS:
+
+Any pin that can TURN OFF (such as not gate but not and gate) fails to change state of wire
