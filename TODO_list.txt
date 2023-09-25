@@ -4,9 +4,9 @@
 
 [X] Add Source
 [X] Add AND gate
-[ ] Add invertor component (NOT gate)
-[ ] Add OR gate
-[ ] Add XOR gate
+[X] Add invertor component (NOT gate)
+[X] Add OR gate
+[X] Add XOR gate
 [ ] Add Button
 [ ] Add Switch
 [ ] Add LED

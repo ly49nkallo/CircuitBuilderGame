@@ -298,6 +298,10 @@ public class Board {
     }
     public void simulate() {
         System.out.println("Simulating...");
+        Array<Entanglement> entanglements = compile();
+        for (Entanglement ent: entanglements) {
+            System.out.println(ent.repr());
+        }
         for (Segment s : segments) {
             if (s instanceof Wire) {
                 Wire w = (Wire) s;
@@ -311,53 +315,30 @@ public class Board {
         }
         int i = 0;
         while (i < 100) {
-            System.out.println("Simulation Step");
-            // flood fill wires and pins
-            for (Component c: this.components) {
-                c.simulate();
-            }
-            for (Component c : this.components) {
-                for (Pin p : c.pins) {
-                    if (p.active) {
-                        Array<Wire> attached = getWiresFromCoordinate(p.x, p.y);
-                        for (Wire a : attached) {
-                            if (!a.active) {
-                                a.active = true;
-                                System.out.println("Changed wire state 2");
-                            }
-                        }
+            for (Entanglement e : entanglements) {
+                if(e.shouldBeActive()) {
+                    for (Pin p: e.pins) {
+                        p.active = true;
+                    }
+                }
+                else {
+                    for (Pin p: e.pins) {
+                        p.active = false;
                     }
                 }
             }
-            for (Segment s : segments) {
-                if (s instanceof Wire) {
-                    Wire w = (Wire) s;
-                    if (w.active) {
-                        int[] endpoints = w.getEndpoints();
-                        Array<Wire> attached = getAttached(endpoints);
-                        for (Wire a : attached) {
-                            if (a.color_id == w.color_id && w != a && !a.active) {
-                                a.active = true;
-                                System.out.println("Changed wire state 1");
-                            }
-                        } 
-                        Pin p1 = getPin(endpoints[0], endpoints[1]);
-                        if (p1 != null && p1.mutable && !p1.active) {
-                            p1.active = true;
-                            System.out.println("Changed pin state 1" + " " + p1.x + " " + p1.y);
-                        }
-                        Pin p2 = getPin(endpoints[2], endpoints[3]);
-                        if (p2 != null && p2.mutable && !p2.active) {
-                            p2.active = true;
-                            System.out.println("Changed pin state 2");
-                        }
-                    }
-                }
-            }
-            for (Component c: this.components) {
+            for (Component c : components) {
                 c.simulate();
             }
             i++;
+        }
+        // paint wires funny colors
+        for (Entanglement e : entanglements) {
+            if (e.shouldBeActive()) {
+                for (Wire w : e.wires) {
+                    w.active = true;
+                }
+            }
         }
         printSummary();
     }
@@ -382,81 +363,44 @@ public class Board {
     //     }
     // }
 
-    // public Graph<Pin, Array<Wire>> compile() {
-    //     /* Create Undirected Graph representing the structure of the circuit */
-    //     long start = TimeUtils.nanoTime();
-    //     Graph<Pin, Array<Wire>> graph = new Graph<Pin, Array<Wire>>();
-    //     Array<Segment> accounted_for = new Array<Segment>(this.height * this.width);
-    //     Array<Array<Pin>> entangled_pins = new Array<Array<Pin>>();
-    //     Array<Array<Wire>> entangled_segments = new Array<Array<Wire>>();
-    //     for (int i = 0; i < this.segments.size; i++) {
-    //         Segment seg = this.segments.get(i);
-    //         if (seg instanceof Wire && !accounted_for.contains(seg, false)) {
-    //             //depth first search (maybe optimal maybe not... java stack is pretty sexy)
-    //             Stack<Wire> stack = new Stack<Wire>();
-    //             Array<Pin> new_entanglement = new Array<Pin>();
-    //             Array<Wire> new_wire_entanglement = new Array<Wire>();
-    //             Wire wire = (Wire) seg;
-    //             int color = wire.color_id;
-    //             stack.push(wire);
-    //             while (!stack.empty()) {
-    //                 Wire v = stack.pop();
-    //                 int[] endpoints = v.getEndpoints();
-    //                 if (!accounted_for.contains(v, false)){
-    //                     accounted_for.add(v);
-    //                     new_wire_entanglement.add(v);
-    //                     Pin c1 = getPin(endpoints[2], endpoints[3]);
-    //                     Pin c2 = getPin(endpoints[0], endpoints[1]);
-    //                     if (c1 != null && !new_entanglement.contains(c1, false)) new_entanglement.add(c1);
-    //                     if (c2 != null && !new_entanglement.contains(c2, false)) new_entanglement.add(c2);
-    //                     Array<Wire> attached1 = getWiresFromCoordinate(endpoints[0], endpoints[1]);
-    //                     Array<Wire> attached2 = getWiresFromCoordinate(endpoints[2], endpoints[3]);
-    //                     Array<Wire> attached = new Array<Wire>(attached1.size + attached2.size);
-    //                     attached.addall(attached1);
-    //                     attached.addall(attached2);
-    //                     for (Wire s1 : attached) {
-    //                         if (s1 != v && s1.color_id == color)
-    //                             stack.push(s1);
-    //                     }
-    //                 }
-    //             }
-    //             entangled_pins.add(new_entanglement);
-    //             entangled_segments.add(new_wire_entanglement);
-    //         }
-    //     }
-    //     System.out.println("DFS search took " + (TimeUtils.nanoTime() - start) + " ns");
-    //     for (int i = 0; i < entangled_pins.size; i++) {
-    //         Array<Pin> ent = entangled_pins.get(i);
-    //         Array<Wire> wires = entangled_segments.get(i);
-    //         Array<Node<Pin>> node_array = new Array<Node<Pin>>(ent.size);
-    //         for (Pin p : ent) {
-    //             Node<Pin> node = new Node<Pin>(p);
-    //             if (!node_array.contains(node, false)) {
-    //                 node_array.add(node);
-    //             }
-    //         }
-    //         Array<Edge<Array<Wire>>> edge_array = new Array<Edge<Array<Wire>>>((node_array.size) * (node_array.size - 1) / 2 + 1);
-    //         for (int z = 0; z < node_array.size; z++) {
-    //             for (int j = 0; j < node_array.size; j++) {
-    //                 Node<?> n1 = node_array.get(z);
-    //                 Node<?> n2 = node_array.get(j);
-    //                 if (n1 == n2) continue;
-    //                 Edge<Array<Wire>> edge = new Edge<Array<Wire>>(wires, false, n1, n2);
-    //                 if (!edge_array.contains(edge, false))
-    //                     edge_array.add(edge);
-    //             }
-    //         }
-    //         for (Node<Pin> n : node_array) {
-    //             graph.addNode(n);
-    //         }
-    //         for (Edge<Array<Wire>> e : edge_array) {
-    //             graph.addEdge(e);
-    //         }
-    //     }
-    //     System.out.println(graph.repr());
-    //     System.out.println("Compilation took " + (TimeUtils.nanoTime() - start) + " ns \n");
-    //     return graph;
-    // }
+    public Array<Entanglement> compile() {
+        /* Create Undirected Graph representing the structure of the circuit */
+        long start = TimeUtils.nanoTime();
+        Array<Segment> accounted_for = new Array<Segment>(this.height * this.width);
+        Array<Entanglement> result = new Array<Entanglement>();
+        for (int i = 0; i < this.segments.size; i++) {
+            Segment seg = this.segments.get(i);
+            if (seg instanceof Wire && !accounted_for.contains(seg, false)) {
+                //depth first search (maybe optimal maybe not... java stack is pretty sexy)
+                Stack<Wire> stack = new Stack<Wire>();
+                Array<Pin> new_entanglement = new Array<Pin>();
+                Array<Wire> new_wire_entanglement = new Array<Wire>();
+                Wire wire = (Wire) seg;
+                int color = wire.color_id;
+                stack.push(wire);
+                while (!stack.empty()) {
+                    Wire v = stack.pop();
+                    int[] endpoints = v.getEndpoints();
+                    if (!accounted_for.contains(v, false)){
+                        accounted_for.add(v);
+                        new_wire_entanglement.add(v);
+                        Pin c1 = getPin(endpoints[2], endpoints[3]);
+                        Pin c2 = getPin(endpoints[0], endpoints[1]);
+                        if (c1 != null && !new_entanglement.contains(c1, false)) new_entanglement.add(c1);
+                        if (c2 != null && !new_entanglement.contains(c2, false)) new_entanglement.add(c2);
+                        Array<Wire> attached = getAttached(endpoints);
+                        for (Wire s1 : attached) {
+                            if (s1 != v && s1.color_id == color)
+                                stack.push(s1);
+                        }
+                    }
+                }
+                result.add(new Entanglement(new_wire_entanglement, new_entanglement));
+            }
+        }
+        System.out.println("DFS search took " + (TimeUtils.nanoTime() - start) + " ns");
+        return result;
+    }
     public void printSummary() {
         System.out.println("Summary:");
         for (Segment s : segments) {

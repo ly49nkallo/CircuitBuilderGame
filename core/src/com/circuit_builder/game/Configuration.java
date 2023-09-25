@@ -61,12 +61,17 @@ public class Configuration {
     public static final int and_gate_width = 2;
     public static final int and_gate_height = 2;
 
-
     public static final int not_gate_width = 1;
     public static final int not_gate_height = 2;
+
+    public static final int or_gate_width = 2;
+    public static final int or_gate_height = 2;
+
+    public static final int xor_gate_width = 2;
+    public static final int xor_gate_height = 2;
     /* I hate this shit */
 
-    public static final int number_of_components = 3;
+    public static final int number_of_components = 5;
     public static Texture getTextureFromComponentID(int component_id) {
         switch(component_id) {
             case 1:
@@ -75,6 +80,10 @@ public class Configuration {
                 return AndGate.s_texture;
             case 3:
                 return NotGate.s_texture;
+            case 4:
+                return OrGate.s_texture;
+            case 5:
+                return XORGate.s_texture;
             default:
                 return null;
         }
@@ -87,6 +96,10 @@ public class Configuration {
                 return and_gate_width;
             case 3:
                 return not_gate_width;
+            case 4:
+                return or_gate_width;
+            case 5:
+                return xor_gate_width;
             default:
                 return -1;
         }
@@ -99,6 +112,10 @@ public class Configuration {
                 return and_gate_height;
             case 3:
                 return not_gate_height;
+            case 4:
+                return or_gate_height;
+            case 5:
+                return xor_gate_height;
             default:
                 return -1;
         }
@@ -111,6 +128,10 @@ public class Configuration {
                 return new AndGate(x, y, null);
             case 3:
                 return new NotGate(x, y, null);
+            case 4:
+                return new OrGate(x, y, null);
+            case 5:
+                return new XORGate(x, y, null);
             default:
                 return null;
         }
