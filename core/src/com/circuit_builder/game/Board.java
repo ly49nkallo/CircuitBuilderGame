@@ -63,9 +63,6 @@ public class Board implements Serializable {
         data[6] = 0;
         data[7] = (byte) (this.segments.size >> 8);
         data[8] = (byte) (this.segments.size & 0xff);
-        System.out.println("a " + (int) data[7]); // 2
-        System.out.println("b " + ((int) data[8] & 0xff)); // 248 //BYTE SIGNED ERROR
-        System.out.println("Storing " + (((int) data[7] << 8) + ((int) data[8] & 0xff)));
         for (int i = 0; i < this.segments.size; i++) {
             data[9 + (i * 9)] = (byte) this.segments.get(i).color_id;
             int x1 = this.segments.get(i).x1;
@@ -453,7 +450,6 @@ public class Board implements Serializable {
     }
     public void simulate() {
         System.out.println("Simulating...");
-        save(Gdx.files.local("saves/save1.sav"));
         Array<Entanglement> entanglements = compile();
         for (Entanglement ent: entanglements) {
             System.out.println(ent.repr());

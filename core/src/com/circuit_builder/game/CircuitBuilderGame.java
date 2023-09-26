@@ -98,6 +98,12 @@ public class CircuitBuilderGame extends Game {
             last_time_touched = TimeUtils.nanoTime();
 
         }
+        if (Gdx.input.isKeyPressed(Input.Keys.N) && TimeUtils.nanoTime() - last_time_touched > cooldown){
+            board.save(Gdx.files.local("saves/save1.sav"));
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.M) && TimeUtils.nanoTime() - last_time_touched > cooldown){
+            board.load(Gdx.files.local("saves/save1.sav"));
+        }
         this.board.render(sr, sb, this.simulationMode);
         if (! this.simulationMode) {
             if (board.getBoundingBox().contains(ptrX, ptrY)){
