@@ -16,5 +16,7 @@
 [ ] Add soundtrack (low priority)
 
 BUGS:
+Save/load system broken because of signed bytes
 
-Any pin that can TURN OFF (such as not gate but not and gate) fails to change state of wire
+
+(Fixed) Any pin that can TURN OFF (such as not gate but not and gate) fails to change state of wire

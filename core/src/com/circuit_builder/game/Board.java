@@ -3,22 +3,20 @@ package com.circuit_builder.game;
 import java.util.Stack;
 
 import com.badlogic.gdx.utils.Array;
-import com.circuit_builder.graph_utils.Edge;
-import com.circuit_builder.graph_utils.Graph;
-import com.circuit_builder.graph_utils.Node;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 
-import java.net.CookieHandler;
 import java.util.Arrays;
+
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.badlogic.gdx.Gdx;
 
-import com.circuit_builder.graph_utils.Graph;
-
-public class Board {
+public class Board implements Serializable {
     // GRID DIMENSIONS
     public int width;
     public int height;
@@ -30,8 +28,160 @@ public class Board {
     public Array<Segment> segments;
 
     public Vertex[] vertices;
-    public Graph<Pin, Array<Wire>> mostRecentCompilation;
 
+    public void save(FileHandle handle) {
+        // file format: 
+        //   (2 bytes) "TY", 
+        //   (2 bytes) 0
+        //   (1 bytes) board.width
+        //   (1 bytes) board.height
+        //   (1 byte) 0
+        //   (2 bytes) # of Wires, 
+        //   For each wire
+        //   (1 byte) wire.color_id
+        //   (2 bytes) wire.x1
+        //   (2 bytes) wire.y1
+        //   (2 bytes) wire.x2
+        //   (2 bytes) wire.y2
+        //   (2 bytes) # of Components
+        //   For each component
+        //   (1 byte) component.id
+        //   (2 bytes) component.x
+        //   (2 bytes) component.y
+        //   (2 bytes) component.width
+        //   (2 bytes) component.height
+        byte[] data = new byte[11 + (this.segments.size * 9) + (this.components.size * 9)];
+        System.out.println("Components size: " + this.components.size);
+        System.out.println("Segments size: " + this.segments.size);
+        System.out.println("Total size: " + data.length);
+        data[0] = (byte) 'T';
+        data[1] = (byte) 'Y';
+        data[2] = 0;
+        data[3] = 0;
+        data[4] = (byte) this.width;
+        data[5] = (byte) this.height;
+        data[6] = 0;
+        data[7] = (byte) (this.segments.size >> 8);
+        data[8] = (byte) (this.segments.size & 0xff);
+        System.out.println("a " + (int) data[7]); // 2
+        System.out.println("b " + ((int) data[8] & 0xff)); // 248 //BYTE SIGNED ERROR
+        System.out.println("Storing " + (((int) data[7] << 8) + ((int) data[8] & 0xff)));
+        for (int i = 0; i < this.segments.size; i++) {
+            data[9 + (i * 9)] = (byte) this.segments.get(i).color_id;
+            int x1 = this.segments.get(i).x1;
+            int y1 = this.segments.get(i).y1;
+            int x2 = this.segments.get(i).x2;
+            int y2 = this.segments.get(i).y2;
+            data[10 + (i * 9)] = (byte) (x1 >> 8);
+            data[11 + (i * 9)] = (byte) (x1 & 0xff);
+            data[12 + (i * 9)] = (byte) (y1 >> 8);
+            data[13 + (i * 9)] = (byte) (y1 & 0xff);
+            data[14 + (i * 9)] = (byte) (x2 >> 8);
+            data[15 + (i * 9)] = (byte) (x2 & 0xff);
+            data[16 + (i * 9)] = (byte) (y2 >> 8);
+            data[17 + (i * 9)] = (byte) (y2 & 0xff);
+        }
+        int offset = (this.segments.size * 9);
+        data[9 + offset] = (byte) (this.components.size >> 8);
+        data[10 + offset] = (byte) (this.components.size & 0xff);
+        for (int i = 0; i < this.components.size; i++) {
+            data[11 + offset + (i * 9)] = (byte) this.components.get(i).id;
+            int x = this.components.get(i).x;
+            int y = this.components.get(i).y;
+            int width = this.components.get(i).width;
+            int height = this.components.get(i).height;
+            data[12 + offset + (i * 9)] = (byte) (x >> 8);
+            data[13 + offset + (i * 9)] = (byte) (x & 0xff);
+            data[14 + offset + (i * 9)] = (byte) (y >> 8);
+            data[15 + offset + (i * 9)] = (byte) (y & 0xff);
+            data[16 + offset + (i * 9)] = (byte) (width >> 8);
+            data[17 + offset + (i * 9)] = (byte) (width & 0xff);
+            data[18 + offset + (i * 9)] = (byte) (height >> 8);
+            data[19 + offset + (i * 9)] = (byte) (height & 0xff);
+        }
+        System.out.println("Bytes saved: " + data.length);
+        handle.writeBytes(data, false);
+    }
+
+    public void load(FileHandle handle) {
+        // file format: 
+        //   (2 bytes) "TY", 
+        //   (2 bytes) 0
+        //   (1 bytes) board.width
+        //   (1 bytes) board.height
+        //   (1 byte) 0
+        //   (2 bytes) # of Wires, 
+        //   For each wire
+        //   (1 byte) wire.color_id
+        //   (2 bytes) wire.x1
+        //   (2 bytes) wire.y1
+        //   (2 bytes) wire.x2
+        //   (2 bytes) wire.y2
+        //   (2 bytes) # of Components
+        //   For each component
+        //   (1 byte) component.id
+        //   (2 bytes) component.x
+        //   (2 bytes) component.y
+        //   (2 bytes) component.width
+        //   (2 bytes) component.height
+        byte[] bytes;
+        try {
+            bytes = handle.readBytes();
+        } catch (GdxRuntimeException e) {
+            return;
+        }
+        if (bytes == null || bytes.length == 0) return; // exit if the save file is empty
+        System.out.println("Attempting load");
+        this.segments = new Array<Segment>(); // reset segments array
+        this.components = new Array<Component>(); // reset components array
+        int ptr = 4;
+        this.width = (int) bytes[ptr] & 0xff; ptr++;
+        this.height = (int) bytes[ptr] & 0xff; ptr++;
+        ptr++;
+        int num_wires = 0;
+        num_wires += (int) bytes[ptr] << 8; ptr++;
+        num_wires += (int) bytes[ptr] & 0xff; ptr++;
+        System.out.println("Found wires: " + num_wires + "ptr: " + ptr);
+        for (int i = 0; i < num_wires; i++) {
+            int color_id = (int) bytes[ptr] & 0xff; ptr++;
+            int x1 = (int) bytes[ptr] << 8 & 0xff; ptr++;
+            x1 += (int) bytes[ptr] & 0xff; ptr++;
+            int y1 = (int) bytes[ptr] << 8 & 0xff; ptr++;
+            y1 += (int) bytes[ptr] & 0xff; ptr++;
+            int x2 = (int) bytes[ptr] << 8 & 0xff; ptr++;
+            x2 += (int) bytes[ptr] & 0xff; ptr++;
+            int y2 = (int) bytes[ptr] << 8 & 0xff; ptr++;
+            y2 += (int) bytes[ptr] & 0xff; ptr++;
+            if (color_id == 0) {
+                this.segments.add(new Segment(x1, y1, x2, y2));
+            }
+            else {
+                this.segments.add(new Wire(color_id, x1, y1, x2, y2));
+            }
+        }
+        int num_c = 0;
+        num_c += (int) bytes[ptr] << 8; ptr++;
+        num_c += (int) bytes[ptr]; ptr++;
+        System.out.println("Found components: " + num_c);
+        for (int i = 0; i < num_c; i++) {
+            int id = (int) bytes[ptr] & 0xff; ptr++;
+            int x = (int) bytes[ptr] << 8; ptr++;
+            x += (int) bytes[ptr] & 0xff; ptr++;
+            int y = (int) bytes[ptr] << 8; ptr++;
+            y += (int) bytes[ptr] & 0xff; ptr++;
+            int width = (int) bytes[ptr] << 8; ptr++;
+            width += (int) bytes[ptr] & 0xff; ptr++;
+            int height = (int) bytes[ptr] << 8; ptr++;
+            height += (int) bytes[ptr] & 0xff; ptr++;
+            Component c = Configuration.getComponentInstanceFromComponentID(id, x, y);
+            if (c == null) {
+                System.out.println("component instance is null");
+                continue;
+            }
+            c.parent = this;
+            addComponent(c);
+        }
+    }
 
     public Board(int width, int height) {
         this.width = width;
@@ -41,6 +191,11 @@ public class Board {
         this.components = new Array<Component>();
         this.vertices = new Vertex[this.height * this.width];
         this.segments = new Array<Segment>();
+        setLocation( // centered location
+            Configuration.screen_width / 2 - (this.getGridDimensions()[0] / 2),
+            Configuration.screen_height / 2 - (this.getGridDimensions()[1] / 2));
+        this.constructSegments();
+        this.constructVertexObjects();
     }
 
     public void constructVertexObjects(){
@@ -298,6 +453,7 @@ public class Board {
     }
     public void simulate() {
         System.out.println("Simulating...");
+        save(Gdx.files.local("saves/save1.sav"));
         Array<Entanglement> entanglements = compile();
         for (Entanglement ent: entanglements) {
             System.out.println(ent.repr());

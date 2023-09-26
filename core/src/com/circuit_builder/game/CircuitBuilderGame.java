@@ -58,11 +58,7 @@ public class CircuitBuilderGame extends Game {
         sr = new ShapeRenderer();
         sb = new SpriteBatch(200);
         board = new Board(20, 20);
-        board.setLocation( // centered location
-            Configuration.screen_width / 2 - (this.board.getGridDimensions()[0] / 2),
-            Configuration.screen_height / 2 - (this.board.getGridDimensions()[1] / 2));
-        board.constructVertexObjects();
-        board.constructSegments();
+        board.load(Gdx.files.local("saves/save1.sav"));
         colorbar = new Colorbar();
         colorbar.setLocation(
             Configuration.screen_width / 2 - (Colorbar.getWidth / 2),

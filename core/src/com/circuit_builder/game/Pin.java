@@ -11,7 +11,6 @@ public class Pin {
         this.y = y;
         this.parent = parent;
         this.active = false;
-        this.mutable = true;
     }
 
 }
