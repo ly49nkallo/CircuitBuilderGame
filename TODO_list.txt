@@ -1,6 +1,7 @@
 [ ] Make UI better (!)
 [X] Ability to simulate the circuit (we have to decide whether we will use real
     simulation with kirchoff's laws or just binary)
+[X] Serialization
 
 [X] Add Source
 [X] Add AND gate
@@ -16,7 +17,7 @@
 [ ] Add soundtrack (low priority)
 
 BUGS:
-Save/load system broken because of signed bytes
+(Fixed) Save/load system broken because of signed bytes
 
 
 (Fixed) Any pin that can TURN OFF (such as not gate but not and gate) fails to change state of wire
