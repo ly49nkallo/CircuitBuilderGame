@@ -178,6 +178,7 @@ public class Board implements Serializable {
             c.parent = this;
             addComponent(c);
         }
+        System.out.println("Successfully loaded board state!");
     }
 
     public Board(int width, int height) {
