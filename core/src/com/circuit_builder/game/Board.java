@@ -64,7 +64,13 @@ public class Board implements Serializable {
         data[7] = (byte) (this.segments.size >> 8);
         data[8] = (byte) (this.segments.size & 0xff);
         for (int i = 0; i < this.segments.size; i++) {
-            data[9 + (i * 9)] = (byte) this.segments.get(i).color_id;
+            Segment seg = this.segments.get(i);
+            if (seg instanceof Wire) {
+                data[9 + (i * 9)] = (byte)((Wire) seg).color_id;
+            }
+            else {
+                data[9 + (i * 9)] = (byte) seg.color_id;
+            }
             int x1 = this.segments.get(i).x1;
             int y1 = this.segments.get(i).y1;
             int x2 = this.segments.get(i).x2;
@@ -98,6 +104,7 @@ public class Board implements Serializable {
         }
         System.out.println("Bytes saved: " + data.length);
         handle.writeBytes(data, false);
+        printSummary();
     }
 
     public void load(FileHandle handle) {
@@ -153,6 +160,7 @@ public class Board implements Serializable {
                 this.segments.add(new Segment(x1, y1, x2, y2));
             }
             else {
+                System.out.println("Color_id is non zero");
                 this.segments.add(new Wire(color_id, x1, y1, x2, y2));
             }
         }
@@ -179,6 +187,7 @@ public class Board implements Serializable {
             addComponent(c);
         }
         System.out.println("Successfully loaded board state!");
+        printSummary();
     }
 
     public Board(int width, int height) {
@@ -583,5 +592,13 @@ public class Board implements Serializable {
                     System.out.println("    " + "(Pin) " + p.x + " " + p.y + "(Not Active)");
             }
         }
+        int num_of_wires = 0;
+        for (Segment s : segments) {
+            if (s instanceof Wire) {
+                num_of_wires++;
+                System.out.println("(Wire)" + ((Wire)s).color_id);
+            }
+        }
+        System.out.println("Number of wires: " + num_of_wires);
     }
 }

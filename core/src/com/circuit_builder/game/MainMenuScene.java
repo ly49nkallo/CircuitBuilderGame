@@ -11,6 +11,7 @@ public class MainMenuScene implements Screen{
     final CircuitBuilderGame game;
     OrthographicCamera camera;
     Texture background_texture;
+    int elapsed;
 
     public MainMenuScene(final CircuitBuilderGame game) {
         this.game = game;
@@ -20,6 +21,9 @@ public class MainMenuScene implements Screen{
     }
     @Override
     public void render(float delta) {
+        float ptrX = Gdx.input.getX();
+        float ptrY = Gdx.input.getY();
+        elapsed++;
         ScreenUtils.clear(1f, 1f, 1f, 1f);
 
         camera.update();
@@ -28,10 +32,18 @@ public class MainMenuScene implements Screen{
         game.batch.begin();
         game.batch.draw(this.background_texture, 0, 0, Configuration.screen_width, Configuration.screen_height);
         game.batch.end();
+        if (ptrX > Configuration.screen_width / 2) {
+            if (Gdx.input.isTouched() && elapsed > 30) {
+                game.setScreen(game.loadScreen);
+                dispose();
+            }
+        }
+        else {
+            if (Gdx.input.isTouched() && elapsed > 30) {
+                game.setScreen(game.boardScreen);
+                dispose();
+            }
 
-        if (Gdx.input.isTouched()) {
-            game.setScreen(game.boardScreen);
-            dispose();
         }
     }
     @Override
@@ -40,6 +52,7 @@ public class MainMenuScene implements Screen{
 
 	@Override
 	public void show() {
+        elapsed = 0;
 	}
 
 	@Override

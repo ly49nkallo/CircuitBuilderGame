@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -26,18 +27,24 @@ public class CircuitBuilderGame extends Game {
 
     protected Screen boardScreen;
     protected Screen mainMenuScreen;
+    protected Screen loadScreen;
+    protected FileHandle savesFileHandle;
     SpriteBatch batch;
     BitmapFont font;
+    boolean fl;
 
     @Override
     public void create () {
         boardScreen = new BoardScene(this);
         mainMenuScreen = new MainMenuScene(this);
+        loadScreen = new LoadScreen(this);
+        savesFileHandle = Gdx.files.local("/saves/save1.sav");
 
         batch = new SpriteBatch();
         font = new BitmapFont();
         font.setColor(Color.BLACK);
         this.setScreen(mainMenuScreen);
+        fl = false;
     }
 
     @Override

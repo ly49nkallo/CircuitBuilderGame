@@ -27,7 +27,7 @@ public class BoardScene implements Screen {
     private OrthographicCamera camera;
     ShapeRenderer sr;
     SpriteBatch sb;
-    Board board;
+    public Board board;
     Colorbar colorbar;
     ComponentBar componentBar;
     private float last_ptrX, last_ptrY;
@@ -54,7 +54,6 @@ public class BoardScene implements Screen {
         sr = new ShapeRenderer();
         sb = new SpriteBatch(200);
         board = new Board(20, 20);
-        board.load(Gdx.files.local("saves/save1.sav"));
         colorbar = new Colorbar();
         colorbar.setLocation(
             Configuration.screen_width / 2 - (Colorbar.getWidth / 2),
@@ -66,7 +65,6 @@ public class BoardScene implements Screen {
         );
         this.last_ptrX = 0; this.last_ptrY = 0;
         simulationMode = false;
-    
     }
     @Override
     public void render(float delta) {
@@ -95,10 +93,10 @@ public class BoardScene implements Screen {
 
         }
         if (Gdx.input.isKeyPressed(Input.Keys.N) && TimeUtils.nanoTime() - last_time_touched > cooldown){
-            board.save(Gdx.files.local("saves/save1.sav"));
+            board.save(Gdx.files.local("saves/default.sav"));
         }
         if (Gdx.input.isKeyPressed(Input.Keys.M) && TimeUtils.nanoTime() - last_time_touched > cooldown){
-            board.load(Gdx.files.local("saves/save1.sav"));
+            board.load(Gdx.files.local("saves/default.sav"));
         }
         this.board.render(sr, sb, this.simulationMode);
         if (! this.simulationMode) {
@@ -230,5 +228,9 @@ public class BoardScene implements Screen {
 	}
     @Override
 	public void show() {
+        if (game.fl)
+            board.load(Gdx.files.local("/saves/default.sav"));
+        if (game.fl)
+            System.out.println("Tried to load default.sav");
     }
 }
