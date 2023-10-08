@@ -187,7 +187,6 @@ public class Board implements Serializable {
             addComponent(c);
         }
         System.out.println("Successfully loaded board state!");
-        printSummary();
     }
 
     public Board(int width, int height) {

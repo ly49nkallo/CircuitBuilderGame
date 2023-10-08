@@ -69,9 +69,13 @@ public class Configuration {
 
     public static final int xor_gate_width = 2;
     public static final int xor_gate_height = 2;
+
+    public static final int led_width = 1;
+    public static final int led_height = 2;
+    public static final Color led_color = Color.RED;
     /* I hate this shit */
 
-    public static final int number_of_components = 5;
+    public static final int number_of_components = 6;
     public static Texture getTextureFromComponentID(int component_id) {
         switch(component_id) {
             case 1:
@@ -84,6 +88,8 @@ public class Configuration {
                 return OrGate.s_texture;
             case 5:
                 return XORGate.s_texture;
+            case 6:
+                return LED.s_texture;
             default:
                 return null;
         }
@@ -100,6 +106,8 @@ public class Configuration {
                 return or_gate_width;
             case 5:
                 return xor_gate_width;
+            case 6:
+                return led_width;
             default:
                 return -1;
         }
@@ -116,6 +124,8 @@ public class Configuration {
                 return or_gate_height;
             case 5:
                 return xor_gate_height;
+            case 6:
+                return led_height;
             default:
                 return -1;
         }
@@ -132,6 +142,8 @@ public class Configuration {
                 return new OrGate(x, y, null);
             case 5:
                 return new XORGate(x, y, null);
+            case 6:
+                return new LED(x, y, null);
             default:
                 return null;
         }
